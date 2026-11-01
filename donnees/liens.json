@@ -1,0 +1,11 @@
+{
+  "_note": "Tous les liens du site. null = pas encore fourni (le site affiche « Bientôt »). Ne jamais inventer un lien. Pour YouTube, mettre seulement l'identifiant de la vidéo (les 11 caractères après v=).",
+  "youtube": null,
+  "spotify": null,
+  "amazon": null,
+  "billets": null,
+  "instagram": null,
+  "facebook": null,
+  "dates_concert": null,
+  "lieu_concert": null
+}

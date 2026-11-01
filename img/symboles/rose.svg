@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="t d">
+<title id="t">Rose, symbole Écriture</title>
+<desc id="d">Une rose ouverte de face, pétales découpés en rouge cerclés d’un trait blanc, courte tige et trois feuilles au trait blanc, à la manière de l’encre de la couverture « Différente comme tout le monde ».</desc>
+<g fill="none" stroke="#F2EFEA" stroke-linecap="round" stroke-linejoin="round">
+<g id="trait-tige" stroke-width="1.25">
+<path pathLength="1" d="M100 118C101 140 97 162 91 186"/>
+<path pathLength="1" d="M99 133L104 129M96 162L91 158" stroke-width="1.1"/>
+</g>
+<g id="feuilles" stroke-width="1.1">
+<g id="feuille-gauche"><path pathLength="1" d="M98 152C85 162 62 158 48 138C65 131 86 135 98 152Z"/><path pathLength="1" d="M97 151C82 146 66 142 50 139"/><path d="M66 143L60 150M76 145L70 153M86 148L81 155M70 143L66 137M82 146L79 139" stroke-width="0.8" opacity=".7"/></g>
+<g id="feuille-droite"><path pathLength="1" d="M99 139C110 124 134 118 152 124C142 141 117 148 99 139Z"/><path pathLength="1" d="M100 138C116 131 134 127 150 125"/><path d="M118 132L124 140M130 129L137 136M140 127L147 132M122 131L120 124M134 128L133 121" stroke-width="0.8" opacity=".7"/></g>
+<g id="feuille-basse"><path pathLength="1" d="M94 170C104 160 121 160 132 168C121 177 104 178 94 170Z"/><path pathLength="1" d="M95 170C107 168 120 168 131 168"/><path d="M108 168L112 174M118 168L122 173M110 168L113 163" stroke-width="0.8" opacity=".7"/></g>
+</g>
+<g id="sepales" stroke-width="1.1"><path pathLength="1" d="M98 120C92 126 84 128 76 128C84 124 90 120 94 114M102 120C108 126 116 128 124 127C117 123 111 119 106 114"/></g>
+<g id="fleur" transform="rotate(-8 100 80)">
+<g id="couleur-et-trait" fill="#A8292E" stroke-width="1.25">
+<path id="arriere-gauche" pathLength="1" d="M100 46C88 28 60 24 48 42C38 58 44 78 58 90L100 82Z"/>
+<path id="arriere-droit" pathLength="1" d="M100 46C112 28 140 24 152 42C162 58 156 78 142 90L100 82Z"/>
+<path id="arriere-haut" pathLength="1" d="M72 46C73 31 90 23 100 31C110 23 127 31 128 46L100 74Z"/>
+<path id="bouton" pathLength="1" d="M80 63C79 49 91 42 100 44C110 42 122 50 120 63C116 73 84 73 80 63Z"/>
+<path id="milieu-gauche" pathLength="1" d="M101 76C86 78 68 73 62 60C58 51 62 45 69 44C71 56 80 64 101 67Z"/>
+<path id="milieu-droit" pathLength="1" d="M99 76C114 78 132 73 138 60C142 51 138 45 131 44C129 56 120 64 99 67Z"/>
+<path id="coupe-avant" pathLength="1" d="M68 66C74 85 89 94 100 94C112 94 127 85 132 66C123 75 112 71 100 77C89 71 78 75 68 66Z"/>
+<path id="bas-gauche" pathLength="1" d="M101 101C85 114 60 114 48 101C38 90 40 77 47 70C53 79 62 84 73 84C80 93 90 97 101 97Z"/>
+<path id="bas-droit" pathLength="1" d="M99 101C115 114 140 114 152 101C162 90 160 77 153 70C147 79 138 84 127 84C120 93 110 97 99 97Z"/>
+<path id="bas-avant" pathLength="1" d="M70 98C76 115 89 124 100 122C111 124 124 115 130 98C120 105 110 102 100 107C90 102 80 105 70 98Z"/>
+</g>
+<g id="hachures" stroke="#0A0A0A" stroke-width="1" opacity=".55"><path d="M86 34L90 40"/><path d="M114 34L110 40"/><path d="M62 40L68 47"/><path d="M138 40L132 47"/><path d="M54 60L60 63"/><path d="M146 60L140 63"/><path d="M74 66L78 63"/><path d="M126 66L122 63"/><path d="M84 82L88 78"/><path d="M116 82L112 78"/><path d="M100 84L100 80"/><path d="M58 96L66 94"/><path d="M142 96L134 94"/><path d="M68 104L75 100"/><path d="M132 104L125 100"/><path d="M86 112L90 108"/><path d="M114 112L110 108"/><path d="M100 116L100 111"/></g>
+<g id="coeur-de-rose" stroke-width="1.1"><path pathLength="1" d="M93 57C94 50 106 49 109 55C111 61 103 64 97 60C94 57 98 53 102 55"/></g>
+</g>
+</g>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="t d">
+<title id="t">Rose (petite taille), symbole Écriture</title>
+<desc id="d">Une rose ouverte de face, pétales découpés en rouge cerclés d’un trait blanc, courte tige et deux feuilles au trait blanc. Version simplifiée pour 64 px.</desc>
+<g fill="none" stroke="#F2EFEA" stroke-linecap="round" stroke-linejoin="round">
+<g id="trait-tige" stroke-width="4.2">
+<path pathLength="1" d="M100 118C101 140 97 162 91 186"/>
+</g>
+<g id="feuilles" stroke-width="3.4">
+<g id="feuille-gauche"><path pathLength="1" d="M98 152C85 162 62 158 48 138C65 131 86 135 98 152Z"/><path pathLength="1" d="M97 151C82 146 66 142 50 139"/></g>
+<g id="feuille-droite"><path pathLength="1" d="M99 139C110 124 134 118 152 124C142 141 117 148 99 139Z"/><path pathLength="1" d="M100 138C116 131 134 127 150 125"/></g>
+</g>
+<g id="sepales" stroke-width="3.4"><path pathLength="1" d="M98 120C92 126 84 128 76 128C84 124 90 120 94 114M102 120C108 126 116 128 124 127C117 123 111 119 106 114"/></g>
+<g id="fleur" transform="rotate(-8 100 80)">
+<g id="couleur-et-trait" fill="#A8292E" stroke-width="4.2">
+<path id="arriere-gauche" pathLength="1" d="M100 46C88 28 60 24 48 42C38 58 44 78 58 90L100 82Z"/>
+<path id="arriere-droit" pathLength="1" d="M100 46C112 28 140 24 152 42C162 58 156 78 142 90L100 82Z"/>
+<path id="arriere-haut" pathLength="1" d="M72 46C73 31 90 23 100 31C110 23 127 31 128 46L100 74Z"/>
+<path id="bouton" pathLength="1" d="M80 63C79 49 91 42 100 44C110 42 122 50 120 63C116 73 84 73 80 63Z"/>
+<path id="coupe-avant" pathLength="1" d="M68 66C74 85 89 94 100 94C112 94 127 85 132 66C123 75 112 71 100 77C89 71 78 75 68 66Z"/>
+<path id="bas-gauche" pathLength="1" d="M101 101C85 114 60 114 48 101C38 90 40 77 47 70C53 79 62 84 73 84C80 93 90 97 101 97Z"/>
+<path id="bas-droit" pathLength="1" d="M99 101C115 114 140 114 152 101C162 90 160 77 153 70C147 79 138 84 127 84C120 93 110 97 99 97Z"/>
+<path id="bas-avant" pathLength="1" d="M70 98C76 115 89 124 100 122C111 124 124 115 130 98C120 105 110 102 100 107C90 102 80 105 70 98Z"/>
+</g>
+<g id="coeur-de-rose" stroke-width="3.2"><path pathLength="1" d="M94 58C97 50 108 52 106 58"/></g>
+</g>
+</g>
+</svg>

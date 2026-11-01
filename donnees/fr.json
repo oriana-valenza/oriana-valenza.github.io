@@ -1,0 +1,257 @@
+{
+  "_note": "Tous les textes du site en français. Pour modifier un texte : changer la valeur entre guillemets, enregistrer, recharger la page. Ne pas toucher aux clés (à gauche des deux-points). null = rien à afficher (le site met « Bientôt » quand c'est prévu).",
+  "langue": "fr",
+  "site": {
+    "nom": "Oriana Valenza",
+    "metier": "Artiste auteure-interprète",
+    "ville": "Montpellier"
+  },
+  "ui": {
+    "menu_ouvrir": "Ouvrir le menu",
+    "menu_fermer": "Fermer le menu",
+    "menu_nav": "Menu principal",
+    "langue": "Langue",
+    "passer": "Passer l'intro",
+    "bientot": "Bientôt",
+    "retour": "Retour à l'accueil",
+    "aller_contenu": "Aller au contenu",
+    "contact_h": "Contact",
+    "contact_txt": "Adresse de contact à venir.",
+    "contact_form": "Formulaire de contact : bientôt.",
+    "lettre_h": "Lettre d'information",
+    "lettre_txt": "Bientôt.",
+    "pages_h": "Pages",
+    "reseaux_h": "Réseaux",
+    "mentions": "Mentions légales",
+    "sans_js": "Ce site a besoin de JavaScript pour afficher son contenu.",
+    "erreur": "Le contenu n'a pas pu être chargé. Ouvrez le site depuis son adresse web (pas depuis un fichier local).",
+    "lire_video": "Lire la vidéo",
+    "video_note": "La vidéo est chargée depuis YouTube (mode confidentialité renforcée) seulement après votre clic.",
+    "ecouter_h": "Écouter et suivre",
+    "youtube": "YouTube",
+    "spotify": "Spotify",
+    "billets": "Billetterie",
+    "amazon": "Acheter le livre",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "visuel_bientot": "Visuel : bientôt"
+  },
+  "nav": {
+    "accueil": "Accueil",
+    "rvl": "RVL",
+    "ecriture": "Écriture",
+    "audiovisuel": "Audiovisuel",
+    "services": "Services",
+    "oriana": "Oriana"
+  },
+  "accueil": {
+    "meta_titre": "Oriana Valenza · Artiste auteure-interprète",
+    "meta_description": "Site d'Oriana Valenza, artiste auteure-interprète née à Montpellier : musique (EP RVL), écriture, audiovisuel et services.",
+    "aria_dessin": "Figure ailée au trait blanc, auréole dorée, ailes ouvertes",
+    "aria_oriana": "Oriana : présentation"
+  },
+  "rvl": {
+    "meta_titre": "RVL, EP piano-voix · Oriana Valenza",
+    "meta_description": "RVL, l'EP piano-voix d'Oriana Valenza : pop, jazz et soul en anglais, des secrets intimes et le chemin vers la résilience.",
+    "kicker": "Ce que j'ai fait ou je fais",
+    "titre": "RVL",
+    "sous_titre": "EP piano-voix pop",
+    "intro": "Pop, jazz et soul, en anglais : des secrets intimes, des blessures invisibles, des émotions profondes, et le chemin vers la résilience.",
+    "credit_label": "Avec",
+    "credit": "un arrangeur-pianiste",
+    "titres_h": "Les titres",
+    "titres": [
+      {
+        "n": 1,
+        "titre": "Hey",
+        "sens": null
+      },
+      {
+        "n": 2,
+        "titre": "Interlude",
+        "sens": "Une louange au piano, instrumental"
+      },
+      {
+        "n": 3,
+        "titre": "End'home",
+        "sens": "De l'espoir face à l'endométriose"
+      },
+      {
+        "n": 4,
+        "titre": "Il",
+        "sens": "Une lettre à mon violeur, le tribunal, l'acceptation"
+      },
+      {
+        "n": 5,
+        "titre": "All I care",
+        "sens": "La recherche d'une sécurité"
+      },
+      {
+        "n": 6,
+        "titre": "RVL",
+        "sens": "Chanson phare : l'importance de l'expression, la joie de trouver sa place"
+      },
+      {
+        "n": 7,
+        "titre": "Conclusion",
+        "sens": "La résilience en une boucle de piano"
+      }
+    ],
+    "clip_h": "Le clip",
+    "clip_txt": "Le clip de RVL est en préparation.",
+    "clip_bientot": "Clip : bientôt",
+    "concert_h": "En concert",
+    "concert_date": "Date",
+    "concert_lieu": "Lieu",
+    "concert_billets": "Billets",
+    "kolam_h": "Un symbole, une prière",
+    "kolam_txt": null,
+    "kolam_alt": "Kolam : dessin tracé à la craie, fait de points reliés par une ligne continue"
+  },
+  "ecriture": {
+    "meta_titre": "Écriture · Oriana Valenza",
+    "meta_description": "Écriture d'Oriana Valenza : le livre « Différente comme tout le monde » et « Ya Astra », en cours d'écriture.",
+    "kicker": "Ce que j'ai fait ou je fais",
+    "titre": "Écriture",
+    "sous_titre": "Livres",
+    "oeuvres": [
+      {
+        "titre": "Différente comme tout le monde",
+        "etat": "Livre paru",
+        "lien": "amazon",
+        "image": "couverture"
+      },
+      {
+        "titre": "Ya Astra",
+        "etat": "En cours d'écriture",
+        "lien": null,
+        "image": null
+      }
+    ],
+    "couverture_alt": "Couverture du livre « Différente comme tout le monde » : une femme aux longs cheveux, une rose rouge dans les cheveux, dessin à l'encre noir et blanc"
+  },
+  "audiovisuel": {
+    "meta_titre": "Audiovisuel · Oriana Valenza",
+    "meta_description": "Audiovisuel : le court métrage V(i)ol, avec Oriana Valenza.",
+    "kicker": "Ce que j'ai fait ou je fais",
+    "titre": "Audiovisuel",
+    "sous_titre": "Court métrage",
+    "viol": {
+      "titre": "V(i)ol",
+      "etat": "Court métrage",
+      "pitch": "Une femme se remémore son viol : dissociation psychique, stress post-traumatique.",
+      "musique": "Musique : co-composition d'Oriana Valenza.",
+      "visuel": "Visuel : bientôt"
+    },
+    "encours_h": "En cours",
+    "documentaires": [],
+    "distinction_h": "Distinction",
+    "distinction": ""
+  },
+  "services": {
+    "meta_titre": "Services · Oriana Valenza",
+    "meta_description": "Ateliers d'expression, coaching de chant, préparation vocale pour casting et accompagnement d'artiste avec Oriana Valenza.",
+    "kicker": "Ce que je propose",
+    "titre": "Services",
+    "sous_titre": "La communication et l'expression comme outils de bien-être psychologique.",
+    "offres": [
+      {
+        "titre": "Ateliers d'expression et coaching de chant",
+        "detail": null
+      },
+      {
+        "titre": "Préparation vocale pour casting",
+        "detail": null
+      },
+      {
+        "titre": "Accompagnement d'artiste",
+        "detail": "Co-écriture de sketch, composition de livre"
+      }
+    ],
+    "contact_h": "Me contacter",
+    "contact_txt": "Adresse de contact à venir.",
+    "contact_form": "Formulaire de contact : bientôt.",
+    "plaquette": "Plaquette de services : bientôt."
+  },
+  "oriana": {
+    "meta_titre": "Oriana Valenza, artiste auteure-interprète",
+    "meta_description": "Oriana Valenza, artiste auteure née à Montpellier : peinture, écriture, chant, chorégraphie. Sa voix, sa voie de résilience.",
+    "kicker": "Artiste auteure-interprète · Montpellier",
+    "titre": "Oriana Valenza",
+    "sous_titre": null,
+    "portrait_alt": "Portrait d'Oriana Valenza, souriante, cheveux longs bouclés, collier brillant",
+    "parcours_h": "Parcours",
+    "parcours": [
+      {
+        "date": "1993",
+        "texte": "Débuts lyriques à l'opéra de Montpellier"
+      },
+      {
+        "date": "2000–2018",
+        "texte": "Gospel, trip hop, électro à Paris"
+      },
+      {
+        "date": "2024–2025",
+        "texte": "Sortie du livre, une équipe de 23 bénévoles pour le court métrage, l'EP RVL composé au piano familial historique"
+      }
+    ]
+  },
+  "mentions": {
+    "meta_titre": "Mentions légales · Oriana Valenza",
+    "meta_description": "Mentions légales et confidentialité du site d'Oriana Valenza : aucun cookie, aucun traceur.",
+    "titre": "Mentions légales",
+    "sous_titre": "Et politique de confidentialité",
+    "sections": [
+      {
+        "h": "Éditeur du site",
+        "p": [
+          "À compléter (nom, adresse, numéro SIRET et contact)."
+        ]
+      },
+      {
+        "h": "Responsable de la publication",
+        "p": [
+          "À compléter."
+        ]
+      },
+      {
+        "h": "Hébergeur",
+        "p": [
+          "GitHub Pages, service de GitHub, Inc. (États-Unis). Comme tout hébergeur, GitHub peut enregistrer des données techniques de connexion (par exemple l'adresse IP) pour faire fonctionner le service ; voir la politique de confidentialité de GitHub."
+        ]
+      },
+      {
+        "h": "Cookies et traceurs",
+        "p": [
+          "Ce site n'utilise aucun cookie, aucun outil de mesure d'audience et aucun traceur. Les polices et les scripts sont hébergés sur le site lui-même.",
+          "Seul votre choix de langue (FR ou EN) est mémorisé dans votre navigateur (stockage local) pour vous éviter de le refaire ; il n'est envoyé à personne."
+        ]
+      },
+      {
+        "h": "Vidéos",
+        "p": [
+          "Quand une vidéo est ajoutée, elle n'est chargée depuis YouTube (mode confidentialité renforcée) qu'après votre clic."
+        ]
+      },
+      {
+        "h": "Données personnelles",
+        "p": [
+          "Le site ne collecte aucune donnée personnelle. Si un formulaire de contact ou une lettre d'information sont ajoutés plus tard, cette page sera mise à jour (finalité, durée de conservation, désinscription, droits d'accès, de rectification et de suppression)."
+        ]
+      },
+      {
+        "h": "Propriété intellectuelle",
+        "p": [
+          "Textes, dessins, musiques et images : © Oriana Valenza, sauf mention contraire. Toute reproduction sans accord est interdite.",
+          "Polices : Petit Formal Script et Montserrat, sous licence SIL Open Font License (fichiers de licence dans le dossier polices du site)."
+        ]
+      }
+    ]
+  },
+  "page_404": {
+    "meta_titre": "Page introuvable · Oriana Valenza",
+    "titre": "Page introuvable",
+    "texte": "Cette page n'existe pas ou a changé d'adresse.",
+    "lien": "Retour à l'accueil"
+  }
+}

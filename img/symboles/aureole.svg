@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-220 -130 440 250" role="img" aria-label="Auréole dorée surmontée du nom Oriana">
+  <defs><path id="arc-nom" d="M -150 30 A 180 180 0 0 1 150 30" fill="none"/></defs>
+  <g fill="none" stroke="#B8975A" stroke-linecap="round">
+    <ellipse pathLength="1" cx="0" cy="62" rx="118" ry="28" stroke-width="3"/>
+    <ellipse pathLength="1" cx="0" cy="62" rx="106" ry="23" stroke-width="1.2" stroke-opacity=".7"/>
+  </g>
+  <text font-family="'Petit Formal Script',cursive" font-size="74" fill="#F2EFEA"><textPath href="#arc-nom" startOffset="50%" text-anchor="middle">Oriana</textPath></text>
+</svg>
