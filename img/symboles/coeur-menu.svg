@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="93 110 310 310" role="img" aria-label="Cœur sacré : un cœur dans une couronne d'épines, une flamme au-dessus, des rayons de lumière">
-  <defs><mask id="fondu" maskUnits="userSpaceOnUse" x="93" y="110" width="310" height="310"><radialGradient id="fondu-g" cx="248" cy="265" r="155" gradientUnits="userSpaceOnUse"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient><rect x="93" y="110" width="310" height="310" fill="url(#fondu-g)"/></mask>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="115 110 310 310" role="img" aria-label="Cœur sacré : un cœur dans une couronne d'épines, une flamme au-dessus, des rayons de lumière">
+  <defs><mask id="fondu" maskUnits="userSpaceOnUse" x="95" y="110" width="310" height="310"><radialGradient id="fondu-g" cx="250" cy="265" r="155" gradientUnits="userSpaceOnUse"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient><rect x="95" y="110" width="310" height="310" fill="url(#fondu-g)"/></mask>
     <radialGradient id="halo-g"><stop offset="0" stop-color="#A8292E" stop-opacity=".42"/><stop offset=".45" stop-color="#A8292E" stop-opacity=".12"/><stop offset="1" stop-color="#A8292E" stop-opacity="0"/></radialGradient>
     <radialGradient id="halo-b"><stop offset="0" stop-color="#F2EFEA" stop-opacity=".16"/><stop offset="1" stop-color="#F2EFEA" stop-opacity="0"/></radialGradient>
   </defs>
