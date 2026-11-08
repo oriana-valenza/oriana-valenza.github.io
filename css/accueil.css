@@ -19,5 +19,5 @@ html,body{height:100%}
 .symbole:focus-visible{outline:1px solid var(--or);outline-offset:3px}
 .symbole.vu{animation:none;opacity:1}
 @keyframes apparait{to{opacity:1}}
-@media (max-width:699px){.symbole .libelle{font-size:11px;letter-spacing:.1em}}
+@media (max-width:699px){.symbole{gap:1px}.symbole .libelle{font-size:11px;letter-spacing:.1em}}
 @media (prefers-reduced-motion:reduce){#dessin,.symbole{animation:none;opacity:1}.symbole .icone{transition:none}}
