@@ -88,7 +88,7 @@
         ${f.image ? `<div class="visuel">${image(f.image, f.image_alt, 'visuel-img')}</div>` : ''}</article>`;
     };
     return hero(P, OV.t('nav.audiovisuel')) +
-      P.parties.map((pa) => bloc(pa.h, pa.films.map(film).join(''))).join('');
+      P.parties.map((pa) => `<section class="cadre bloc entre"><h2 class="partie">${esc(pa.h)}</h2>${pa.films.map(film).join('')}</section>`).join('');
   }
   function services(P) {
     return hero(P, OV.t('nav.services')) +

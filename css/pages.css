@@ -173,3 +173,10 @@ body[data-page="audiovisuel"] h1{font-size:clamp(34px,10.5vw,74px);white-space:n
 
 /* Titre RVL : Italianno (choix de Simon) */
 body[data-page="rvl"] h1{font-family:"Italianno",var(--titre);font-size:clamp(110px,30.6vw,170px);letter-spacing:.03em;line-height:1.05}
+
+/* Audiovisuel : en-têtes de parties = style d'origine de « Court métrage » (.etat) */
+.bloc h2.partie{font-family:var(--texte);font-weight:400;font-size:13px;line-height:1.7;letter-spacing:.14em;text-transform:uppercase;color:#D6666A}
+.bloc h2.partie::after{display:none}
+.bloc h2.partie+*{margin-top:22px}
+/* Même proportion pour toutes les images (celle de V(i)ol, 772 x 938) */
+.visuel-img{aspect-ratio:772/938;object-fit:cover}
