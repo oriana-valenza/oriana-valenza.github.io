@@ -47,7 +47,7 @@ Français par défaut ; `?lang=en` à la fin de l'adresse pour l'anglais. Le bou
 - `index.html` : accueil (l'ange est le menu). `oriana/`, `rvl/`, `ecriture/`, `audiovisuel/`, `services/`, `mentions-legales/`, `404.html`.
 - `css/`, `js/` : mise en page et comportements (`js/pages.js` contient les gabarits de pages et l'intro animée).
 - `img/` : ange, symboles (`img/symboles/`), portrait, couvertures, photos des projets (WebP), image de partage. Aucun PDF dans le dépôt. L'ange (`img/ange.svg`) est provisoire : le remplacer par la version finale en gardant le même nom et le même repère (viewBox `-640 90 1280 2200`).
-- `polices/` : Petit Formal Script et Montserrat, avec leurs licences (OFL).
+- `polices/` : Petit Formal Script, Italianno (titre RVL) et Montserrat, avec leurs licences (OFL).
 - `sitemap.xml`, `robots.txt`, `favicon.svg`, `.nojekyll`.
 
 ## Intro animée

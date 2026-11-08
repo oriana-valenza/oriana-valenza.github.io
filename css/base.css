@@ -3,6 +3,7 @@
 @font-face{font-family:"Montserrat";font-weight:400;src:url("../polices/montserrat-latin-400-normal.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"Montserrat";font-weight:600;src:url("../polices/montserrat-latin-600-normal.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"Petit Formal Script";font-weight:400;src:url("../polices/petit-formal-script-latin-400-normal.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"Italianno";font-weight:400;src:url("../polices/italianno-latin-400-normal.woff2") format("woff2");font-display:swap}
 :root{--bg:#0A0A0A;--surface:#151515;--ligne:#2A2A2A;--ink:#F2EFEA;--muted:#B9B4AB;--or:#B8975A;--rouge:#A8292E;--accent:var(--or);--accent-rgb:184,151,90;
   --titre:"Petit Formal Script",Georgia,serif;--texte:"Montserrat",system-ui,sans-serif}
 *{box-sizing:border-box}
