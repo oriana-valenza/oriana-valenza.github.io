@@ -3,7 +3,6 @@
     <radialGradient id="halo-g"><stop offset="0" stop-color="#A8292E" stop-opacity=".42"/><stop offset=".45" stop-color="#A8292E" stop-opacity=".12"/><stop offset="1" stop-color="#A8292E" stop-opacity="0"/></radialGradient>
     <radialGradient id="halo-b"><stop offset="0" stop-color="#F2EFEA" stop-opacity=".16"/><stop offset="1" stop-color="#F2EFEA" stop-opacity="0"/></radialGradient>
   </defs>
-  <rect id="fond" width="540" height="580" fill="#0A0A0A"/>
   <g transform="translate(20,0)" fill="none" stroke="#F2EFEA" stroke-linecap="round" stroke-linejoin="round">
     <g mask="url(#fondu)"><g id="halo" stroke="none">
       <circle cx="250" cy="290" r="250" fill="url(#halo-b)"/>
