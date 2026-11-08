@@ -185,3 +185,6 @@ body[data-page="rvl"] h1{font-family:"Italianno",var(--titre);font-size:clamp(11
 body[data-page="audiovisuel"] .film-vedette h3{font-size:clamp(30px,5.2vw,50px)}
 body[data-page="audiovisuel"] .film-vedette .resume{margin-top:14px;font-size:15px;line-height:1.65}
 body[data-page="audiovisuel"] .film-vedette .info{font-size:13.5px;margin-top:8px}
+
+/* Services : affiche complète de l'atelier (proportions d'origine) */
+.affiche{display:block;width:100%;max-width:520px;height:auto;border:1px solid var(--ligne)}

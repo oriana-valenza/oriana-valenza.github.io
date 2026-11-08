@@ -92,7 +92,7 @@
   }
   function services(P) {
     return hero(P, OV.t('nav.services')) +
-      `<section class="cadre bloc entre"><div>${P.offres.map((o) => `<article class="oeuvre"><div><h3>${esc(o.titre)}</h3>${o.detail ? `<p class="etat">${esc(o.detail)}</p>` : ''}</div>${image(o.image, o.image_alt, 'couverture')}</article>`).join('')}</div></section>` +
+      `<section class="cadre bloc entre"><div>${P.offres.map((o) => `<article class="oeuvre"><div><h3>${esc(o.titre)}</h3>${o.detail ? `<p class="etat">${esc(o.detail)}</p>` : ''}</div>${image(o.image, o.image_alt, 'affiche')}</article>`).join('')}</div></section>` +
       bloc(P.contact_h, `<p>${esc(P.contact_txt)}</p><p class="muet">${esc(P.contact_form)}</p><p class="muet">${esc(P.plaquette)}</p><p class="muet">${esc(P.siret)}</p>`);
   }
   async function oriana(P) {
