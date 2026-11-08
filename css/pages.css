@@ -188,3 +188,6 @@ body[data-page="audiovisuel"] .film-vedette .info{font-size:13.5px;margin-top:8p
 
 /* Services : affiche complète de l'atelier (proportions d'origine) */
 .affiche{display:block;width:100%;max-width:520px;height:auto;border:1px solid var(--ligne)}
+
+/* Image paysage (clip) : proportion naturelle */
+.visuel-img.paysage{aspect-ratio:auto;object-fit:contain;max-width:360px}

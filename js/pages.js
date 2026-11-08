@@ -85,7 +85,7 @@
     const film = (f) => {
       const lien = f.lien ? lienEcoute('youtube', urlYoutube(f.lien)) : '';
       return `<article class="film-vedette${f.image ? '' : ' sans-visuel'}"><div><h3>${esc(f.titre)}</h3><p class="resume">${esc(f.texte)}</p>${(f.infos || []).map((i) => `<p class="muet info">${esc(i)}</p>`).join('')}${lien ? `<p style="margin-top:20px">${lien}</p>` : ''}</div>
-        ${f.image ? `<div class="visuel">${image(f.image, f.image_alt, 'visuel-img')}</div>` : ''}</article>`;
+        ${f.image ? `<div class="visuel">${image(f.image, f.image_alt, 'visuel-img' + (f.paysage ? ' paysage' : ''))}</div>` : ''}</article>`;
     };
     return hero(P, OV.t('nav.audiovisuel')) +
       P.parties.map((pa) => `<section class="cadre bloc entre"><h2 class="partie">${esc(pa.h)}</h2>${pa.films.map(film).join('')}</section>`).join('');
