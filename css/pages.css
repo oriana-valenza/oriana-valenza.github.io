@@ -141,3 +141,32 @@ body[data-page="rvl"] .hero #ligne{stroke:var(--or)}
 body[data-page="rvl"] .hero #points{fill:var(--or)}
 h1{overflow-wrap:anywhere}
 @media (min-width:900px){h1{font-size:clamp(56px,6.4vw,96px)}}
+
+/* Paroles dépliables (RVL) */
+.t-bouton{font:inherit;color:inherit;background:none;border:0;padding:4px 0;margin:-4px 0;cursor:pointer;text-align:left;display:inline-flex;align-items:center;gap:10px}
+.t-bouton::after{content:"+";color:var(--or);font-size:.8em;width:1em;text-align:center}
+.t-bouton[aria-expanded="true"]::after{content:"\2212"}
+.t-bouton:hover{color:var(--or)}
+.paroles{grid-column:2/-1;margin-top:12px;padding-left:16px;border-left:1px solid var(--or);font-size:15px;line-height:1.7}
+.paroles p{white-space:pre-line}
+.paroles p+p{margin-top:14px}
+.paroles[hidden]{display:none}
+/* Nouvelles parties audiovisuel */
+.film-vedette+.film-vedette{margin-top:clamp(48px,7vw,80px)}
+.film-vedette .resume{margin-top:20px}
+.film-vedette .info{margin-top:10px;font-size:15px}
+.film-vedette .visuel{display:flex;justify-content:center}
+.visuel-img{display:block;width:100%;max-width:360px;height:auto;border:1px solid var(--ligne)}
+.oeuvre .resume{margin-top:18px;max-width:36em}
+.oeuvre .couverture{width:min(70vw,280px)}
+body[data-page="audiovisuel"] h1{font-size:clamp(34px,10.5vw,74px);white-space:nowrap;overflow-wrap:normal}
+@media (min-width:900px){body[data-page="audiovisuel"] h1{font-size:clamp(48px,5.4vw,84px)}}
+/* Cœur : halo doré qui bat doucement (cycle 1,6 s, variation faible, aucun flash) */
+@media (prefers-reduced-motion:no-preference){
+  body[data-page="audiovisuel"] .hero .sym svg{animation:battement 1.6s ease-in-out infinite;transform-origin:50% 50%}
+}
+@keyframes battement{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(184,151,90,.22))}
+  25%{transform:scale(1.025);filter:drop-shadow(0 0 20px rgba(184,151,90,.5))}
+  55%{transform:scale(1.008);filter:drop-shadow(0 0 12px rgba(184,151,90,.32))}
+}

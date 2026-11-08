@@ -34,7 +34,8 @@
     "amazon": "Buy the book",
     "instagram": "Instagram",
     "facebook": "Facebook",
-    "visuel_bientot": "Visual: coming soon"
+    "visuel_bientot": "Visual: coming soon",
+    "paroles_bientot": "Lyrics coming soon"
   },
   "nav": {
     "accueil": "Home",
@@ -53,111 +54,199 @@
   "rvl": {
     "meta_titre": "RVL, piano-vocal EP · Oriana Valenza",
     "meta_description": "RVL, the piano-vocal EP by Oriana Valenza: pop, jazz and soul in English, intimate secrets and the road to resilience.",
-    "kicker": "What I have done and what I do",
     "titre": "RVL",
     "sous_titre": "Pop piano-vocal EP",
     "intro": "Pop, jazz and soul, in English: intimate secrets, invisible wounds, deep emotions, and the road to resilience.",
-    "credit_label": "With",
-    "credit": "an arranger and pianist",
+    "credit_label": "Piano arranger",
+    "credit": "Edie",
     "titres_h": "Tracklist",
     "titres": [
       {
         "n": 1,
         "titre": "Hey",
-        "sens": null
+        "sens": "A gradual breakup",
+        "instrumental": false,
+        "paroles": null
       },
       {
         "n": 2,
         "titre": "Interlude",
-        "sens": "A praise on the piano, instrumental"
+        "sens": "A praise on the piano, instrumental",
+        "instrumental": true,
+        "paroles": null
       },
       {
         "n": 3,
-        "titre": "End'home",
-        "sens": "Hope in the face of endometriosis"
+        "titre": "Réconcilier",
+        "sens": "Peace within the family",
+        "instrumental": false,
+        "paroles": null
       },
       {
         "n": 4,
-        "titre": "Il",
-        "sens": "A letter to my rapist, the trial, acceptance"
+        "titre": "Love affaire",
+        "sens": "From a love story to a criminal case",
+        "instrumental": false,
+        "paroles": null
       },
       {
         "n": 5,
         "titre": "All I care",
-        "sens": "The search for safety"
+        "sens": "A woman walks toward recognition",
+        "instrumental": false,
+        "paroles": null
       },
       {
         "n": 6,
         "titre": "RVL",
-        "sens": "Signature song: the importance of expression, the joy of finding one's place"
+        "sens": "Signature song: the importance of expression, the joy of finding one's place",
+        "instrumental": false,
+        "paroles": null
       },
       {
         "n": 7,
         "titre": "Conclusion",
-        "sens": "Resilience in a single piano loop"
+        "sens": "Resilience in a single piano loop",
+        "instrumental": false,
+        "paroles": null
       }
     ],
-    "clip_h": "The video",
-    "clip_txt": "The video for RVL is in the making.",
-    "clip_bientot": "Video: coming soon",
+    "clip_h": "The music videos",
+    "clip_txt": "The music videos for RVL are in the making.",
+    "clip_bientot": "Music videos: coming soon",
     "concert_h": "Live",
     "concert_date": "Date",
     "concert_lieu": "Venue",
     "concert_billets": "Tickets",
     "kolam_h": "A symbol, a prayer",
-    "kolam_txt": null,
+    "kolam_txt": [
+      "The kolam is a geometric prayer drawn on the ground with rice powder by Hindu women in front of the entrance of their homes during the festival of abundance.",
+      "During a month-long trip to India, I learned this ritual with a group of women from the art school “Sitaa” in Pondicherry.",
+      "That stay was a revelation for my rebuilding, as I was there to recover from a series of epileptic seizures, thanks to the help of my father and my stepmother.",
+      "I kept this kolam symbol. It is tattooed on my arm as a sign of divine protection and a tribute to creativity.",
+      "While composing the EP, I chose it as the logo of the RVL project. It seemed obvious to me that its feminine energy would support the intimate words and messages of my lyrics.",
+      "This feminine tradition is passed down exclusively from mother to daughter, for generations. Every morning at dawn, the women perform this ritual with the door of their house open.",
+      "It is a moment to honour their fertility and the creative nature of women, and then to protect their home for the year.",
+      "At sunrise, the rays passing over the drawing to enter the house are believed to fulfil the prayer of these women inside the home.",
+      "During this period, men walk around the drawing as they pass, to enter the house, as a sign of respect for the creative nature of Woman.",
+      "There are several standard models of kolam, and I chose the most ancestral one. It dates back to 300 BC.",
+      "It represents my music, through the universality of the themes explored around Woman."
+    ],
     "kolam_alt": "Kolam: a chalk-drawn pattern made of dots joined by one continuous line"
   },
   "ecriture": {
     "meta_titre": "Writing · Oriana Valenza",
-    "meta_description": "Writing by Oriana Valenza: the book \"Différente comme tout le monde\" and \"Ya Astra\", currently being written.",
-    "kicker": "What I have done and what I do",
+    "meta_description": "Writing by Oriana Valenza: the book \"Différente comme tout le monde\" and \"Ya Rashra\", her mother's memoirs, currently being written.",
     "titre": "Writing",
     "sous_titre": "Books",
     "oeuvres": [
       {
         "titre": "Différente comme tout le monde",
-        "etat": "Published book (in French)",
+        "etat": "Book in French",
         "lien": "amazon",
-        "image": "couverture"
+        "image": "couverture-differente.webp",
+        "image_alt": "Cover of the book \"Différente comme tout le monde\": a woman with long hair and a red rose in her hair, black and white ink drawing",
+        "resume": "Between poems, dances and existential questions, the journey of a little girl on the margins slaloms its way into adult life. She meets her experiences, not without a crash. Tinged with resilience and struggle, this story evokes dreams, illness, rape, travel and love. It stresses the importance of opening our eyes to the beauty of the World beyond obstacles. That little girl is you, it is me. We are all different, just like everyone."
       },
       {
-        "titre": "Ya Astra",
+        "titre": "Ya Rashra",
         "etat": "Work in progress",
         "lien": null,
-        "image": null
+        "image": "ya-rashra.webp",
+        "image_alt": "Cover of the book \"Ya Rashra\"",
+        "resume": "Following recorded interviews with my mother, here are her memoirs. A life between North Africa and France. Lines that smell of jasmine!"
       }
-    ],
-    "couverture_alt": "Cover of the book \"Différente comme tout le monde\": a woman with long hair and a red rose in her hair, black and white ink drawing"
+    ]
   },
   "audiovisuel": {
     "meta_titre": "Audiovisual · Oriana Valenza",
-    "meta_description": "Audiovisual work: the short film V(i)ol, with Oriana Valenza.",
-    "kicker": "What I have done and what I do",
+    "meta_description": "Audiovisual work: the short film V(i)ol, the documentary projects Bâtisseuse, Flashback and Classé sans suite, and the RVL music videos, with Oriana Valenza.",
     "titre": "Audiovisual",
-    "sous_titre": "Short film",
-    "viol": {
-      "titre": "V(i)ol",
-      "etat": "Short film",
-      "pitch": "A woman recalls her rape: psychological dissociation, post-traumatic stress.",
-      "musique": "Music: co-composed by Oriana Valenza.",
-      "visuel": "Visual: coming soon"
-    },
-    "encours_h": "In progress",
-    "documentaires": [],
-    "distinction_h": "Award",
-    "distinction": ""
+    "sous_titre": "Short film - Documentary projects - Collaborations - Music videos - Festivals",
+    "parties": [
+      {
+        "h": "Short film",
+        "films": [
+          {
+            "titre": "V(i)ol",
+            "texte": "A woman suffering from post-traumatic stress emerges from amnesia and tries to react to her sexual trauma.",
+            "infos": [
+              "Music: co-composed by Oriana Valenza and Florian Duclaye.",
+              "Collaborations: 24 volunteers",
+              "Main characters: Amandine Billoux, Yvan Balandras"
+            ],
+            "lien": null,
+            "image": "viol.webp",
+            "image_alt": "Photo from the short film V(i)ol: close-up of a woman's knees, with the title V(I)OL"
+          }
+        ]
+      },
+      {
+        "h": "Documentary projects",
+        "films": [
+          {
+            "titre": "Bâtisseuse",
+            "texte": "Following Marine Parre's renovation project. An exclusively female building site.",
+            "infos": [],
+            "lien": "youtube_batisseuse",
+            "image": "batisseuse.webp",
+            "image_alt": "A woman in a green sweater running cables through a wall on the building site"
+          },
+          {
+            "titre": "Flashback",
+            "texte": "Flashes of memory, the fight of victims of traumatic amnesia, until the veil lifts and they testify and speak of rebuilding.",
+            "infos": [
+              "Collaboration: Charlotte Espel"
+            ],
+            "lien": null,
+            "image": "flashback.webp",
+            "image_alt": "First page of the press kit of the documentary Flashback"
+          }
+        ]
+      },
+      {
+        "h": "Music videos",
+        "films": [
+          {
+            "titre": "RVL",
+            "texte": "The RVL EP in images",
+            "infos": [
+              "Acting collaboration: 6 volunteers"
+            ],
+            "lien": null,
+            "image": null,
+            "image_alt": null
+          }
+        ]
+      },
+      {
+        "h": "Contributions",
+        "films": [
+          {
+            "titre": "Classé sans suite",
+            "texte": "This documentary gathers experiences of complaints that were dismissed without further action.",
+            "infos": [
+              "Project lead: Nora Ounnas Leroy"
+            ],
+            "lien": null,
+            "image": "classe-sans-suite.webp",
+            "image_alt": "First page of the press kit of the documentary Classé sans suite"
+          }
+        ]
+      }
+    ]
   },
   "services": {
     "meta_titre": "Services · Oriana Valenza",
     "meta_description": "Expression workshops, singing coaching, vocal preparation for castings and artist support with Oriana Valenza.",
-    "kicker": "What I offer",
     "titre": "Services",
     "sous_titre": "Communication and expression as tools for psychological well-being.",
     "offres": [
       {
         "titre": "Expression workshops and singing coaching",
-        "detail": null
+        "detail": null,
+        "image": "atelier.webp",
+        "image_alt": "A dinner table set with candles, at an expression workshop"
       },
       {
         "titre": "Vocal preparation for castings",
@@ -171,7 +260,8 @@
     "contact_h": "Get in touch",
     "contact_txt": "Contact address coming soon.",
     "contact_form": "Contact form: coming soon.",
-    "plaquette": "Services brochure: coming soon."
+    "plaquette": "Services brochure: coming soon.",
+    "siret": "SIRET: 51076144800016"
   },
   "oriana": {
     "meta_titre": "Oriana Valenza, singer-songwriter and artist",
@@ -184,15 +274,43 @@
     "parcours": [
       {
         "date": "1993",
-        "texte": "Lyric debut at the Montpellier Opera"
+        "texte": "Junior Opera, Montpellier"
       },
       {
         "date": "2000–2018",
-        "texte": "Gospel, trip hop and electro in Paris"
+        "texte": "Gospel - Kumbaya, trip hop albums, electro in Paris - Rebirth composition with Daniel Savy"
       },
       {
-        "date": "2024–2025",
-        "texte": "Release of the book, a team of 23 volunteers for the short film, the RVL EP composed on the historic family piano"
+        "date": "2015",
+        "texte": "Visual arts teacher"
+      },
+      {
+        "date": "2015",
+        "texte": "Creation of the festival: Festiv'Arts"
+      },
+      {
+        "date": "2018",
+        "texte": "Show: “viens danser du rire aux larmes” (come dance from laughter to tears) by Guillermo"
+      },
+      {
+        "date": "2019",
+        "texte": "Exhibition beautydivercity"
+      },
+      {
+        "date": "2019",
+        "texte": "Release of the book “Différente comme tout le monde”"
+      },
+      {
+        "date": "2023",
+        "texte": "Release of the short film “V(i)ol”"
+      },
+      {
+        "date": "2023",
+        "texte": "The Voice - Casting"
+      },
+      {
+        "date": "2026",
+        "texte": "Semi-final of the Thau singing competition"
       }
     ]
   },
@@ -205,7 +323,7 @@
       {
         "h": "Site publisher",
         "p": [
-          "To be completed (name, address, SIRET number and contact)."
+          "SIRET: 51076144800016. Name, address and contact to be completed."
         ]
       },
       {

@@ -38,7 +38,8 @@
     return lienSur(url) ? `<a class="lien-bouton" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${nom}</a>`
       : `<span class="lien-bouton vide">${nom} <span class="bientot">${esc(OV.t('ui.bientot'))}</span></span>`;
   };
-  const urlYoutube = () => (/^[\w-]{11}$/.test(OV.L.youtube || '') ? 'https://www.youtube.com/watch?v=' + OV.L.youtube : null);
+  const urlYoutube = (cle = 'youtube') => (/^[\w-]{11}$/.test(OV.L[cle] || '') ? 'https://www.youtube.com/watch?v=' + OV.L[cle] : null);
+  const image = (nom, alt, cls) => (nom ? `<img class="${cls}" src="${OV.base}img/${esc(nom)}" alt="${esc(alt)}" loading="lazy">` : '');
 
   function hero(P, alt) {
     return `<section class="cadre hero${SYM ? '' : ' sans-sym'}" aria-labelledby="titre-page">
@@ -61,32 +62,38 @@
       : `<div class="cadre-video"><p class="vide">${esc(P.clip_bientot)}</p></div>`;
     return hero(P, P.kolam_alt) +
       bloc(OV.t('ui.ecouter_h'), `<div class="liens-ecoute">${lienEcoute('youtube', urlYoutube())}${lienEcoute('spotify', OV.L.spotify)}</div>`) +
-      bloc(P.titres_h, `<ol class="titres">${P.titres.map((t) => `<li><span class="n">${esc(t.n)}</span><span class="t">${esc(t.titre)}</span>${t.sens ? `<span class="s">${esc(t.sens)}</span>` : ''}</li>`).join('')}</ol>`) +
+      bloc(P.titres_h, `<ol class="titres">${P.titres.map((t) => {
+        const paroles = typeof t.paroles === 'string' && t.paroles.trim()
+          ? t.paroles.trim().split(/\n\s*\n/).map((x) => `<p>${esc(x)}</p>`).join('') : `<p class="muet">${esc(OV.t('ui.paroles_bientot'))}</p>`;
+        const titre = t.instrumental ? `<span class="t">${esc(t.titre)}</span>`
+          : `<span class="t"><button class="t-bouton" type="button" aria-expanded="false" aria-controls="paroles-${esc(t.n)}">${esc(t.titre)}</button></span>`;
+        return `<li><span class="n">${esc(t.n)}</span>${titre}${t.sens ? `<span class="s">${esc(t.sens)}</span>` : ''}${t.instrumental ? '' : `<div class="paroles" id="paroles-${esc(t.n)}" role="region" aria-label="${esc(t.titre)}" hidden>${paroles}</div>`}</li>`;
+      }).join('')}</ol>`) +
       bloc(P.clip_h, `<p>${esc(P.clip_txt)}</p>${clip}`) +
       bloc(P.concert_h, `<dl class="infos"><dt>${esc(P.concert_date)}</dt><dd>${OV.L.dates_concert ? esc(OV.L.dates_concert) : bientot()}</dd>
         <dt>${esc(P.concert_lieu)}</dt><dd>${OV.L.lieu_concert ? esc(OV.L.lieu_concert) : bientot()}</dd>
         <dt>${esc(P.concert_billets)}</dt><dd>${lienSur(OV.L.billets) ? `<a href="${esc(OV.L.billets)}" target="_blank" rel="noopener noreferrer">${esc(OV.t('ui.billets'))}</a>` : bientot()}</dd></dl>`) +
-      bloc(P.kolam_h, P.kolam_txt ? `<p>${esc(P.kolam_txt)}</p>` : `<p>${bientot()}</p>`);
+      bloc(P.kolam_h, Array.isArray(P.kolam_txt) ? P.kolam_txt.map((x) => `<p>${esc(x)}</p>`).join('') : P.kolam_txt ? `<p>${esc(P.kolam_txt)}</p>` : `<p>${bientot()}</p>`);
   }
   function ecriture(P) {
     return hero(P, OV.t('nav.ecriture')) + `<section class="cadre bloc entre"><div>${P.oeuvres.map((o) => {
       const lien = o.lien ? lienEcoute(o.lien, OV.L[o.lien]) : '';
-      const img = o.image === 'couverture' ? `<img class="couverture" src="${OV.base}img/couverture-differente.webp" width="938" height="1500" alt="${esc(P.couverture_alt)}" loading="lazy">` : '';
-      return `<article class="oeuvre"><div><h3>${esc(o.titre)}</h3><p class="etat">${esc(o.etat)}</p>${lien ? `<p style="margin-top:20px">${lien}</p>` : ''}</div>${img}</article>`;
+      return `<article class="oeuvre"><div><h3>${esc(o.titre)}</h3>${o.etat ? `<p class="etat">${esc(o.etat)}</p>` : ''}${o.resume ? `<p class="resume">${esc(o.resume)}</p>` : ''}${lien ? `<p style="margin-top:20px">${lien}</p>` : ''}</div>${image(o.image, o.image_alt, 'couverture')}</article>`;
     }).join('')}</div></section>`;
   }
   function audiovisuel(P) {
-    const v = P.viol;
+    const film = (f) => {
+      const lien = f.lien ? lienEcoute('youtube', urlYoutube(f.lien)) : '';
+      return `<article class="film-vedette${f.image ? '' : ' sans-visuel'}"><div><h3>${esc(f.titre)}</h3><p class="resume">${esc(f.texte)}</p>${(f.infos || []).map((i) => `<p class="muet info">${esc(i)}</p>`).join('')}${lien ? `<p style="margin-top:20px">${lien}</p>` : ''}</div>
+        ${f.image ? `<div class="visuel">${image(f.image, f.image_alt, 'visuel-img')}</div>` : ''}</article>`;
+    };
     return hero(P, OV.t('nav.audiovisuel')) +
-      `<section class="cadre bloc entre"><article class="film-vedette"><div><p class="etat">${esc(v.etat)}</p><h3>${esc(v.titre)}</h3><p style="margin-top:20px">${esc(v.pitch)}</p><p class="muet" style="margin-top:14px">${esc(v.musique)}</p></div>
-        <div class="visuel-ph">${esc(v.visuel)}</div></article></section>` +
-      (P.documentaires && P.documentaires.length ? bloc(P.encours_h, `<div>${P.documentaires.map((d) => `<article class="oeuvre"><div><h3>${esc(d.titre)}</h3><p class="etat">${esc(d.etat)}</p></div></article>`).join('')}</div>`) : '') +
-      (P.distinction ? bloc(P.distinction_h, `<p>${esc(P.distinction)}</p>`) : '');
+      P.parties.map((pa) => bloc(pa.h, pa.films.map(film).join(''))).join('');
   }
   function services(P) {
     return hero(P, OV.t('nav.services')) +
-      `<section class="cadre bloc entre"><div>${P.offres.map((o) => `<article class="oeuvre"><div><h3>${esc(o.titre)}</h3>${o.detail ? `<p class="etat">${esc(o.detail)}</p>` : ''}</div></article>`).join('')}</div></section>` +
-      bloc(P.contact_h, `<p>${esc(P.contact_txt)}</p><p class="muet">${esc(P.contact_form)}</p><p class="muet">${esc(P.plaquette)}</p>`);
+      `<section class="cadre bloc entre"><div>${P.offres.map((o) => `<article class="oeuvre"><div><h3>${esc(o.titre)}</h3>${o.detail ? `<p class="etat">${esc(o.detail)}</p>` : ''}</div>${image(o.image, o.image_alt, 'couverture')}</article>`).join('')}</div></section>` +
+      bloc(P.contact_h, `<p>${esc(P.contact_txt)}</p><p class="muet">${esc(P.contact_form)}</p><p class="muet">${esc(P.plaquette)}</p><p class="muet">${esc(P.siret)}</p>`);
   }
   async function oriana(P) {
     let paras = [];
@@ -210,6 +217,14 @@
     });
   }
 
+  function paroles() {
+    document.querySelectorAll('.t-bouton').forEach((b) => b.addEventListener('click', () => {
+      const ouvert = b.getAttribute('aria-expanded') === 'true';
+      b.setAttribute('aria-expanded', String(!ouvert));
+      document.getElementById(b.getAttribute('aria-controls')).hidden = ouvert;
+    }));
+  }
+
   /* ---------- Construction ---------- */
   async function afficher() {
     const P = OV.t(PAGE === 'mentions' ? 'mentions' : PAGE === '404' ? 'page_404' : PAGE);
@@ -220,7 +235,7 @@
     const texte = await chargerSymbole();
     const h = document.getElementById('sym-hero');
     if (h && texte) { const s = cloneSvg(texte); if (s) h.appendChild(s); }
-    revelations(); video();
+    revelations(); video(); paroles();
     return texte;
   }
 

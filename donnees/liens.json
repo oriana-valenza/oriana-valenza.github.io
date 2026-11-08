@@ -1,11 +1,12 @@
 {
-  "_note": "Tous les liens du site. null = pas encore fourni (le site affiche « Bientôt »). Ne jamais inventer un lien. Pour YouTube, mettre seulement l'identifiant de la vidéo (les 11 caractères après v=).",
+  "_note": "Tous les liens du site. null = pas encore fourni (le site affiche « Bientôt »). Ne jamais inventer un lien. Pour YouTube, mettre seulement l'identifiant de la vidéo (les 11 caractères après v=). Pour youtube_batisseuse : l'identifiant de la vidéo du documentaire Bâtisseuse (11 caractères).",
   "youtube": null,
   "spotify": null,
-  "amazon": null,
+  "amazon": "https://www.amazon.fr/Diff%C3%A9rente-comme-monde-Oriana-Valenza/dp/B08PRHM5PJ",
   "billets": null,
   "instagram": null,
   "facebook": null,
   "dates_concert": null,
-  "lieu_concert": null
+  "lieu_concert": null,
+  "youtube_batisseuse": null
 }
