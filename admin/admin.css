@@ -17,7 +17,10 @@ main, #bandeau { max-width: 44rem; margin: 0 auto; padding: 1rem; }
 #bandeau .b { border-radius: .6rem; padding: .7rem .9rem; margin-bottom: .6rem; border: 1px solid var(--alerte); }
 #bandeau .b.rouge { border-color: var(--erreur); }
 h2 { font-size: 1.3rem; margin: .5rem 0 1rem; }
-h3 { font-size: 1.05rem; margin: 1.4rem 0 .5rem; color: var(--accent); }
+/* Couleur = repère : rouge pour les titres de blocs et les boutons, noir pour les champs et leur contenu */
+h3, h3.bloc { font-size: 1.1rem; margin: 2.2rem 0 .6rem; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: .3rem; }
+h4.sous { font-size: 1rem; margin: 1.3rem 0 .3rem; color: var(--texte); }
+.grille strong { color: var(--accent); }
 p { margin: .5rem 0; }
 .doux { color: var(--doux); font-size: .9rem; }
 button, .bouton { font: inherit; min-height: 3rem; padding: .6rem 1rem; border-radius: .7rem; border: 1px solid var(--bord); background: var(--carte); color: var(--texte); cursor: pointer; }

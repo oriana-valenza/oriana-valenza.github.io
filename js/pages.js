@@ -38,7 +38,7 @@
     return lienSur(url) ? `<a class="lien-bouton" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${nom}</a>`
       : `<span class="lien-bouton vide">${nom} <span class="bientot">${esc(OV.t('ui.bientot'))}</span></span>`;
   };
-  const urlYoutube = (cle = 'youtube') => (/^[\w-]{11}$/.test(OV.L[cle] || '') ? 'https://www.youtube.com/watch?v=' + OV.L[cle] : null);
+  const urlYoutube = (cle = 'youtube') => { const v = OV.L[cle] || ''; return lienSur(v) ? v : /^[\w-]{11}$/.test(v) ? 'https://www.youtube.com/watch?v=' + v : null; }; // adresse complète (chaîne, playlist, vidéo) ou identifiant de vidéo
   const image = (nom, alt, cls) => (nom ? `<img class="${cls}" src="${OV.base}img/${esc(nom)}" alt="${esc(alt)}" loading="lazy">` : '');
 
   function hero(P, alt) {
@@ -56,10 +56,16 @@
   const bientot = () => `<span class="bientot">${esc(OV.t('ui.bientot'))}</span>`;
 
   function rvl(P) {
-    const youtube = OV.L.youtube;
-    const clip = /^[\w-]{11}$/.test(youtube || '')
-      ? `<div class="cadre-video" id="cadre-video"><button class="lire" type="button" data-video="${esc(youtube)}"><span class="triangle" aria-hidden="true"></span><span>${esc(OV.t('ui.lire_video'))}</span></button></div><p class="note">${esc(OV.t('ui.video_note'))}</p>`
+    // Clips : une liste (titre + identifiant YouTube), un lecteur par clip ; tant qu'il n'y en a pas, le cadre « bientôt » et sa phrase d'attente.
+    const clips = (P.clips || []).filter((c) => c && /^[\w-]{11}$/.test(c.youtube || ''));
+    const clip = clips.length
+      ? clips.map((c) => `<div class="clip">${c.titre ? `<h3>${esc(c.titre)}</h3>` : ''}<div class="cadre-video"><button class="lire" type="button" data-video="${esc(c.youtube)}" data-titre="${esc(c.titre || P.clip_h)}"><span class="triangle" aria-hidden="true"></span><span>${esc(OV.t('ui.lire_video'))}</span></button></div></div>`).join('') + `<p class="note">${esc(OV.t('ui.video_note'))}</p>`
       : `<div class="cadre-video"><p class="vide">${esc(P.clip_bientot)}</p></div>`;
+    // Concerts : une liste (date, lieu, adresse de billetterie) ; tant qu'il n'y en a pas, trois « Bientôt ».
+    const concerts = (P.concerts || []).filter((c) => c && (c.date || c.lieu));
+    const concert = concerts.length
+      ? concerts.map((c) => `<dl class="infos concert">${c.date ? `<dt>${esc(P.concert_date)}</dt><dd>${esc(c.date)}</dd>` : ''}${c.lieu ? `<dt>${esc(P.concert_lieu)}</dt><dd>${esc(c.lieu)}</dd>` : ''}${lienSur(c.billets) ? `<dt>${esc(P.concert_billets)}</dt><dd><a href="${esc(c.billets)}" target="_blank" rel="noopener noreferrer">${esc(OV.t('ui.billets'))}</a></dd>` : ''}</dl>`).join('')
+      : `<dl class="infos"><dt>${esc(P.concert_date)}</dt><dd>${bientot()}</dd><dt>${esc(P.concert_lieu)}</dt><dd>${bientot()}</dd><dt>${esc(P.concert_billets)}</dt><dd>${bientot()}</dd></dl>`;
     return hero(P, P.kolam_alt) +
       bloc(OV.t('ui.ecouter_h'), `<div class="liens-ecoute">${lienEcoute('youtube', urlYoutube())}${lienEcoute('spotify', OV.L.spotify)}</div>`) +
       bloc(P.titres_h, `<ol class="titres">${P.titres.map((t) => {
@@ -69,10 +75,8 @@
           : `<span class="t"><button class="t-bouton" type="button" aria-expanded="false" aria-controls="paroles-${esc(t.n)}">${esc(t.titre)}</button></span>`;
         return `<li><span class="n">${esc(t.n)}</span>${titre}${t.sens ? `<span class="s">${esc(t.sens)}</span>` : ''}${t.instrumental ? '' : `<div class="paroles" id="paroles-${esc(t.n)}" role="region" aria-label="${esc(t.titre)}" hidden>${paroles}</div>`}</li>`;
       }).join('')}</ol>`) +
-      bloc(P.clip_h, `<p>${esc(P.clip_txt)}</p>${clip}`) +
-      bloc(P.concert_h, `<dl class="infos"><dt>${esc(P.concert_date)}</dt><dd>${OV.L.dates_concert ? esc(OV.L.dates_concert) : bientot()}</dd>
-        <dt>${esc(P.concert_lieu)}</dt><dd>${OV.L.lieu_concert ? esc(OV.L.lieu_concert) : bientot()}</dd>
-        <dt>${esc(P.concert_billets)}</dt><dd>${lienSur(OV.L.billets) ? `<a href="${esc(OV.L.billets)}" target="_blank" rel="noopener noreferrer">${esc(OV.t('ui.billets'))}</a>` : bientot()}</dd></dl>`) +
+      bloc(P.clip_h, `${clips.length ? '' : `<p>${esc(P.clip_txt)}</p>`}${clip}`) +
+      bloc(P.concert_h, concert) +
       bloc(P.kolam_h, Array.isArray(P.kolam_txt) ? P.kolam_txt.map((x) => `<p>${esc(x)}</p>`).join('') : P.kolam_txt ? `<p>${esc(P.kolam_txt)}</p>` : `<p>${bientot()}</p>`);
   }
   function ecriture(P) {
@@ -208,13 +212,12 @@
   }
 
   function video() {
-    const b = document.querySelector('[data-video]'); if (!b) return;
-    b.addEventListener('click', () => {
+    document.querySelectorAll('[data-video]').forEach((b) => b.addEventListener('click', () => {
       const f = document.createElement('iframe');
       f.src = 'https://www.youtube-nocookie.com/embed/' + b.dataset.video + '?autoplay=1&rel=0';
-      f.title = OV.t('rvl.clip_h'); f.allow = 'autoplay; encrypted-media; picture-in-picture'; f.allowFullscreen = true; f.referrerPolicy = 'strict-origin-when-cross-origin';
+      f.title = b.dataset.titre || OV.t('rvl.clip_h'); f.allow = 'autoplay; encrypted-media; picture-in-picture'; f.allowFullscreen = true; f.referrerPolicy = 'strict-origin-when-cross-origin';
       b.replaceWith(f);
-    });
+    }));
   }
 
   function paroles() {

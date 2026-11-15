@@ -29,6 +29,28 @@
     { id: 'liens', titre: 'Liens', aide: 'YouTube, Spotify, Amazon, réseaux', special: 'liens' },
     { id: 'bio', titre: 'Biographie', aide: 'Le texte de présentation', special: 'bio' },
   ];
+  // Règle de couleur : ROUGE = titre d'un bloc de la page (dans l'ordre du site) ; NOIR = les champs à l'intérieur.
+  const GOOGLE = { titre: 'Pour Google et le partage', cles: ['meta_titre', 'meta_description'] };
+  const BLOCS = {
+    rvl: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre', 'intro', 'credit_label', 'credit'] }, { titre: "Les titres de l'EP", cles: ['titres_h', 'titres'] },
+      { titre: 'Les clips', cles: ['clip_h', 'clip_txt', 'clip_bientot', 'clips'] }, { titre: 'En concert', cles: ['concert_h', 'concert_date', 'concert_lieu', 'concert_billets', 'concerts'] },
+      { titre: 'Un symbole, une prière (le kolam)', cles: ['kolam_h', 'kolam_txt', 'kolam_alt'] }, GOOGLE],
+    ecriture: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les livres', cles: ['oeuvres'] }, GOOGLE],
+    audiovisuel: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les parties et leurs films', cles: ['parties'] }, GOOGLE],
+    services: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les offres', cles: ['offres'] },
+      { titre: 'Me contacter', cles: ['contact_h', 'contact_txt', 'contact_form', 'plaquette', 'siret'] }, GOOGLE],
+    oriana: [{ titre: 'En-tête de la page', cles: ['kicker', 'titre', 'sous_titre', 'portrait_alt'] }, { titre: 'Parcours', cles: ['parcours_h', 'parcours'] }, GOOGLE],
+    mentions: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les sections', cles: ['sections'] }, GOOGLE],
+    accueil: [{ titre: "Page d'accueil", cles: ['aria_dessin', 'aria_oriana'] }, GOOGLE],
+    site: [{ titre: 'Nom, métier et ville', cles: ['nom', 'metier', 'ville'] }],
+    nav: [{ titre: 'Noms des pages dans le menu', cles: null }],
+    page_404: [{ titre: 'Page introuvable (erreur 404)', cles: null }],
+    ui: [{ titre: 'Menu et navigation', cles: ['menu_ouvrir', 'menu_fermer', 'menu_nav', 'langue', 'passer', 'retour', 'aller_contenu'] },
+      { titre: 'Bas de page', cles: ['contact_h', 'contact_txt', 'contact_form', 'lettre_h', 'lettre_txt', 'pages_h', 'reseaux_h', 'mentions'] },
+      { titre: 'Boutons et liens', cles: ['ecouter_h', 'youtube', 'spotify', 'billets', 'amazon', 'instagram', 'facebook'] },
+      { titre: 'Lecteur de vidéo et contenus à venir', cles: ['lire_video', 'video_note', 'bientot', 'paroles_bientot', 'visuel_bientot'] },
+      { titre: "Messages d'erreur", cles: ['sans_js', 'erreur'] }],
+  };
   const ETIQ = {
     titre: 'Titre', sous_titre: 'Sous-titre', intro: 'Introduction', texte: 'Texte', resume: 'Résumé', etat: "État (ex : En cours d'écriture)",
     detail: 'Détail', image: 'Photo', image_alt: 'Description de la photo (pour les personnes qui ne la voient pas)', lien: 'Lien', infos: 'Infos en plus',
@@ -41,10 +63,10 @@
     clip_h: 'Titre « Clips »', clip_txt: 'Texte des clips', clip_bientot: 'Texte « clips bientôt »', concert_h: 'Titre « En concert »',
     concert_date: 'Libellé « Date »', concert_lieu: 'Libellé « Lieu »', concert_billets: 'Libellé « Billets »', lien_retour: 'Lien de retour',
   };
-  const NOM_ELEMENT = { oeuvres: 'Livre', films: 'Film', parties: 'Partie', offres: 'Offre', titres: 'Titre', parcours: 'Étape', sections: 'Section', infos: 'Ligne', p: 'Paragraphe', kolam_txt: 'Paragraphe' };
+  const NOM_ELEMENT = { concerts: 'Concert', clips: 'Clip', oeuvres: 'Livre', films: 'Film', parties: 'Partie', offres: 'Offre', titres: 'Titre', parcours: 'Étape', sections: 'Section', infos: 'Ligne', p: 'Paragraphe', kolam_txt: 'Paragraphe' };
   const SECTION_NOM = { rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana', accueil: 'Accueil', site: 'Informations générales', mentions: 'Mentions légales', ui: 'Textes du site (boutons, bas de page, messages)', nav: 'Noms des pages dans le menu', page_404: 'Page introuvable (erreur 404)' };
   const LIENS_ETIQ = {
-    youtube: 'YouTube : bouton « YouTube » et lecteur du clip (page Musique). Colle l\'adresse de la vidéo.',
+    youtube: 'YouTube : bouton « YouTube » de « Écouter et suivre » (page Musique). Colle l\'adresse de ta chaîne, d\'une playlist ou d\'une vidéo. (Les clips avec lecteur se règlent dans Musique, « Clips ».)',
     spotify: 'Spotify : bouton « Spotify » (page Musique). Adresse commençant par https://',
     amazon: 'Amazon : bouton du livre « Différente comme tout le monde » (page Écriture)',
     billets: 'Billetterie : lien « Billets » du concert (page Musique)',
@@ -54,7 +76,8 @@
     youtube_batisseuse: 'YouTube : documentaire Bâtisseuse (page Audiovisuel). Colle l\'adresse de la vidéo.',
   };
   const idYoutube = (s) => { const m = String(s || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }; // accepte une adresse complète
-  const PARTAGES = new Set(['image', 'lien', 'n', 'instrumental', 'paysage', 'date', 'langue']);
+  const PARTAGES = new Set(['image', 'lien', 'n', 'instrumental', 'paysage', 'date', 'langue', 'billets', 'youtube']);
+  const MODELES = { concerts: { date: null, lieu: null, billets: null }, clips: { titre: null, youtube: null } }; // listes qui peuvent être vides au départ : forme d'une nouvelle fiche
   const CACHES = new Set(['_note', 'langue', 'n']);
   const LONGS = new Set(['resume', 'texte', 'intro', 'paroles', 'p', 'kolam_txt', 'meta_description', 'sous_titre', 'detail', 'image_alt', 'sens']);
 
@@ -94,7 +117,10 @@
     site: { nom: 'Ton nom (affiché sur le site)', metier: 'Ton métier', ville: 'Ta ville' },
     page_404: { titre: 'Titre de la page introuvable', texte: 'Texte de la page introuvable', lien: 'Texte du lien de retour' },
     mentions: { h: 'Titre de la section', p: 'Paragraphes de la section' },
-    rvl: { titres_h: 'Titre de la liste des titres', clip_bientot: 'Texte dans le cadre vide du clip (avant la vidéo)', credit_label: 'Rôle du crédit (ex. Arrangeur-piano)', credit: 'Nom du crédit' },
+    rvl: {
+      concerts: 'Concerts à venir (un par date : « Bientôt » disparaît dès qu\'il y en a un)', date: 'Date et heure (ex : samedi 12 décembre 2026, 20h)', lieu: 'Lieu (salle, ville)', billets: 'Adresse de la billetterie (commence par https://), laisse vide si entrée libre',
+      clips: 'Clips (un lecteur YouTube par clip : « Clips : bientôt » disparaît dès qu\'il y en a un)', titre: 'Titre', youtube: 'Vidéo YouTube : colle l\'adresse de la vidéo',
+      titres_h: 'Titre de la liste des titres', clip_bientot: 'Texte dans le cadre vide du clip (avant la vidéo)', credit_label: 'Rôle du crédit (ex. Arrangeur-piano)', credit: 'Nom du crédit' },
     services: { contact_txt: 'Texte du contact (par exemple ton adresse e-mail professionnelle)', contact_form: 'Phrase sur le formulaire de contact', plaquette: 'Phrase sur la plaquette de services' },
   };
   const etiquette = (cle, sec) => {
@@ -266,6 +292,8 @@
         if (Array.isArray(o)) o.forEach((x, i) => parcourir(x, [...ch, i]));
         else if (estObjet(o)) {
           for (const cle of ['titre', 'h']) if (k === 'fr' && cle in o && !(o[cle] || '').trim()) erreurs.push(`${nomChemin(k, [...ch, cle])} : le titre ne peut pas être vide.`);
+          if (k === 'fr' && o.billets && !/^https:\/\/\S+$/.test(o.billets)) erreurs.push(`${nomChemin(k, [...ch, 'billets'])} : l'adresse doit commencer par https://`);
+          if (k === 'fr' && 'youtube' in o && o.youtube && !/^[\w-]{11}$/.test(o.youtube)) erreurs.push(`${nomChemin(k, [...ch, 'youtube'])} : colle l'adresse de la vidéo YouTube (ou ses 11 caractères).`);
           if (k === 'fr' && o.image && !S.imgs.has(o.image) && !S.staged.has('img/' + o.image)) erreurs.push(`${nomChemin(k, [...ch, 'image'])} : cette photo n'est plus disponible, choisis-la à nouveau.`);
           if (k === 'fr' && o.image && !(o.image_alt || '').trim()) erreurs.push(`${nomChemin(k, [...ch, 'image_alt'])} : décris la photo en une phrase.`);
           if (o.lien && 'image' in o && !(o.lien in S.docs.liens)) erreurs.push(`${nomChemin(k, [...ch, 'lien'])} : ce lien n'existe pas dans la page « Liens ».`);
@@ -275,7 +303,8 @@
     }
     for (const [c, v] of Object.entries(S.docs.liens)) {
       if (c.startsWith('_') || v == null || v === '') continue;
-      if (c.startsWith('youtube')) { if (!/^[\w-]{11}$/.test(v)) erreurs.push(`Liens › ${LIENS_ETIQ[c] || c} : l'identifiant YouTube a 11 caractères (la fin de l'adresse après « v= »).`); }
+      if (c === 'youtube') { if (!/^[\w-]{11}$/.test(v) && !/^https:\/\/\S+$/.test(v)) erreurs.push("Liens › YouTube (page Musique) : colle l'adresse complète (https://…)."); }
+      else if (c.startsWith('youtube')) { if (!/^[\w-]{11}$/.test(v)) erreurs.push(`Liens › ${LIENS_ETIQ[c] || c} : l'identifiant YouTube a 11 caractères (la fin de l'adresse après « v= »).`); }
       else if (!['dates_concert', 'lieu_concert'].includes(c) && !/^https:\/\/\S+$/.test(v)) erreurs.push(`Liens › ${LIENS_ETIQ[c] || c} : l'adresse doit commencer par https://`);
     }
     // traductions manquantes (non bloquant)
@@ -300,19 +329,20 @@
   let idn = 0;
   function renumeroter(arr) { arr.forEach((x, i) => { if (estObjet(x) && 'n' in x) x.n = i + 1; }); }
 
-  function rendreObjet(conteneur, fr, en, chem) {
+  function rendreObjet(conteneur, fr, en, chem, seulement) {
     for (const [cle, v] of Object.entries(fr)) {
-      if (CACHES.has(cle)) continue;
+      if (CACHES.has(cle) || (seulement && !seulement.includes(cle))) continue;
       const nom = etiquette(cle, chem[0]);
       if (Array.isArray(v)) { conteneur.append(rendreListe(cle, fr, en, chem, nom)); continue; }
-      if (estObjet(v)) { conteneur.append(h('h3', {}, nom)); const g = h('div', {}); rendreObjet(g, v, en[cle], [...chem, cle]); conteneur.append(g); continue; }
+      if (estObjet(v)) { conteneur.append(h('h4', { class: 'sous' }, nom)); const g = h('div', {}); rendreObjet(g, v, en[cle], [...chem, cle]); conteneur.append(g); continue; }
       if (cle === 'image') { conteneur.append(rendrePhoto(fr, en)); continue; }
       if (cle === 'lien' && 'image' in fr && 'infos' in fr) { conteneur.append(rendreVideo(fr, en)); continue; } // film : on colle l'adresse YouTube
       if (cle === 'lien' && 'image' in fr) { conteneur.append(rendreLien(fr, en)); continue; } // « lien » = clé de la page Liens (livres, films) ; ailleurs c'est un texte
       if (typeof v === 'boolean' || cle === 'instrumental' || cle === 'paysage') { conteneur.append(rendreCase(cle, fr, en, nom)); continue; }
       if (PARTAGES.has(cle) && cle !== 'lien') { // champ partagé (ex. date) : un seul champ, écrit dans les deux langues
-        const id = 'c' + (++idn);
-        conteneur.append(h('label', { for: id }, nom), champTexte(fr[cle], false, (x) => { fr[cle] = x; en[cle] = x; }, id)); continue;
+        const id = 'c' + (++idn), champ = champTexte(fr[cle], false, (x) => { fr[cle] = x; en[cle] = x; }, id);
+        if (cle === 'youtube') champ.addEventListener('change', () => { const y = idYoutube(champ.value); if (y) { champ.value = y; fr[cle] = y; en[cle] = y; modifie(); } }); // adresse complète acceptée
+        conteneur.append(h('label', { for: id }, nom), champ); continue;
       }
       const long = LONGS.has(cle) || String(fr[cle] ?? '').length > 70 || String(en[cle] ?? '').length > 70;
       const id = 'c' + (++idn);
@@ -381,8 +411,8 @@
 
   function rendreListe(cle, fr, en, chem, nom) {
     const arrFr = fr[cle], arrEn = en[cle], noun = NOM_ELEMENT[cle] || 'Élément';
-    const texte = !arrFr.some(estObjet);
-    const bloc = h('section', {}, h('h3', {}, nom));
+    const texte = !arrFr.some(estObjet) && !MODELES[cle];
+    const bloc = h('section', {}, h('h4', { class: 'sous' }, nom));
     const redessiner = () => { renumeroter(arrFr); renumeroter(arrEn); const y = scrollY; rendu && rendu(); scrollTo(0, y); };
     const outils = (i) => h('div', { class: 'outils' },
       h('button', { class: 'petit', disabled: i === 0, onclick: () => { [arrFr[i - 1], arrFr[i]] = [arrFr[i], arrFr[i - 1]]; [arrEn[i - 1], arrEn[i]] = [arrEn[i], arrEn[i - 1]]; modifie(); redessiner(); } }, '↑ Monter'),
@@ -396,13 +426,13 @@
             h('div', {}, h('p', { class: 'langue' }, 'Français'), champTexte(arrFr[i], true, (v) => { arrFr[i] = v; }, id + 'f')),
             h('div', {}, h('p', { class: 'langue' }, 'English'), champTexte(arrEn[i], true, (v) => { arrEn[i] = v; }, id + 'e'))), outils(i)));
       } else {
-        const titre = x.titre || x.h || (x.date ? `${x.date} : ${x.texte || ''}` : '') || `${noun} ${i + 1}`;
+        const titre = x.titre || x.h || (x.date ? `${x.date} : ${x.texte || x.lieu || ''}` : '') || x.lieu || `${noun} ${i + 1}`;
         const d = h('details', { class: 'carte', open: arrFr.length <= 3 }, h('summary', {}, `${noun} ${i + 1} : ${String(titre).slice(0, 60)}`));
         const g = h('div', {}); rendreObjet(g, x, arrEn[i], [...chem, cle, i]); d.append(g, outils(i)); bloc.append(d);
       }
     });
     bloc.append(h('div', { class: 'outils' }, h('button', { onclick: () => {
-      const modeleFr = texte ? '' : squelette(arrFr[0] || {}), modeleEn = texte ? '' : clone(modeleFr);
+      const modeleFr = texte ? '' : squelette(arrFr[0] || MODELES[cle] || {}), modeleEn = texte ? '' : clone(modeleFr);
       if (!texte) { for (const o of [modeleFr, modeleEn]) for (const [k, v] of Object.entries(o)) { if (Array.isArray(v)) o[k] = []; if (typeof arrFr[0]?.[k] === 'boolean') o[k] = false; } }
       arrFr.push(modeleFr); arrEn.push(modeleEn); modifie(); redessiner();
     } }, `+ Ajouter ${/^[aeiouéèh]/i.test(noun) ? 'une' : 'un'} ${noun.toLowerCase()}`)));
@@ -419,7 +449,7 @@
         if (k.startsWith('_')) continue;
         const id = 'c' + (++idn);
         const champ = champTexte(L[k], false, (v) => { L[k] = v || null; }, id);
-        if (k.startsWith('youtube')) champ.addEventListener('change', () => { const y = idYoutube(champ.value); if (y) { champ.value = y; L[k] = y; modifie(); } }); // adresse complète acceptée
+        if (k.startsWith('youtube_')) champ.addEventListener('change', () => { const y = idYoutube(champ.value); if (y) { champ.value = y; L[k] = y; modifie(); } }); // adresse complète acceptée
         main.append(h('label', { for: id }, LIENS_ETIQ[k] || etiquette(k)), champ);
       }
       main.append(h('p', { class: 'doux' }, 'Laisse vide si tu n\'as pas encore le lien : le site affichera « Bientôt ». YouTube : seulement les 11 caractères après « v= ».'),
@@ -435,8 +465,10 @@
           h('div', {}, h('p', { class: 'langue' }, 'English'), champTexte(S.docs['bio-en'], true, (v) => { S.docs['bio-en'] = v; }, 'bio-en'))));
     } else {
       for (const cle of sec.cles) {
-        if (sec.cles.length > 1) main.append(h('h3', {}, SECTION_NOM[cle] || etiquette(cle)));
-        const g = h('div', {}); rendreObjet(g, S.docs.fr[cle], S.docs.en[cle], [cle]); main.append(g);
+        const fr = S.docs.fr[cle], en = S.docs.en[cle], blocs = (BLOCS[cle] || [{ titre: SECTION_NOM[cle] || etiquette(cle), cles: null }]).slice();
+        const connus = new Set(blocs.flatMap((b) => b.cles || [])), reste = Object.keys(fr).filter((k) => !connus.has(k) && !CACHES.has(k));
+        if (BLOCS[cle] && reste.length && !blocs.some((b) => !b.cles)) blocs.push({ titre: 'Autres réglages', cles: reste });
+        for (const b of blocs) { main.append(h('h3', { class: 'bloc' }, b.titre)); const g = h('div', {}); rendreObjet(g, fr, en, [cle], b.cles); main.append(g); }
       }
     }
     main.append(h('div', { class: 'outils', style: 'margin-top:2rem' }, h('button', { class: 'danger', onclick: async () => {
