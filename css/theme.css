@@ -1,1 +1,8 @@
 /* Thème : écrit par l'éditeur d'apparence. Ne contient que des lignes --variable:valeur. Vide = thème d'origine (voir :root de base.css). */
+:root{
+--or:#A95BB9;
+--or-rgb:169,91,185;
+--or-clair:#C38CCE;
+--or-pale:#EAD6EE;
+--or-reflet:#D4ADDC;
+}
