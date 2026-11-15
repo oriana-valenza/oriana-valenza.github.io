@@ -77,7 +77,7 @@
       },
       {
         "n": 3,
-        "titre": "Réconcilier",
+        "titre": "Réconciliée",
         "sens": "Apaisement familial",
         "instrumental": false,
         "paroles": null
@@ -253,11 +253,15 @@
       },
       {
         "titre": "Préparation vocale pour casting",
-        "detail": null
+        "detail": null,
+        "image": null,
+        "image_alt": null
       },
       {
         "titre": "Accompagnement d'artiste",
-        "detail": "Co-écriture de sketchs, de paroles, de livres"
+        "detail": "Co-écriture de sketchs, de paroles, de livres",
+        "image": null,
+        "image_alt": null
       }
     ],
     "contact_h": "Me contacter",
