@@ -43,7 +43,17 @@
   };
   const NOM_ELEMENT = { oeuvres: 'Livre', films: 'Film', parties: 'Partie', offres: 'Offre', titres: 'Titre', parcours: 'Étape', sections: 'Section', infos: 'Ligne', p: 'Paragraphe', kolam_txt: 'Paragraphe' };
   const SECTION_NOM = { rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana', accueil: 'Accueil', site: 'Informations générales', mentions: 'Mentions légales', ui: 'Boutons et menus', nav: 'Menu', page_404: 'Page introuvable' };
-  const LIENS_ETIQ = { youtube: 'YouTube : identifiant de la vidéo (11 caractères)', spotify: 'Spotify', amazon: 'Amazon (livre)', billets: 'Billetterie', instagram: 'Instagram', facebook: 'Facebook', dates_concert: 'Date du concert', lieu_concert: 'Lieu du concert', youtube_batisseuse: 'YouTube Bâtisseuse : identifiant de la vidéo' };
+  const LIENS_ETIQ = {
+    youtube: 'YouTube : bouton « YouTube » et lecteur du clip (page Musique). Colle l\'adresse de la vidéo.',
+    spotify: 'Spotify : bouton « Spotify » (page Musique). Adresse commençant par https://',
+    amazon: 'Amazon : bouton du livre « Différente comme tout le monde » (page Écriture)',
+    billets: 'Billetterie : lien « Billets » du concert (page Musique)',
+    instagram: 'Instagram : lien en bas de toutes les pages',
+    facebook: 'Facebook : lien en bas de toutes les pages',
+    dates_concert: 'Date du concert (page Musique)', lieu_concert: 'Lieu du concert (page Musique)',
+    youtube_batisseuse: 'YouTube : documentaire Bâtisseuse (page Audiovisuel). Colle l\'adresse de la vidéo.',
+  };
+  const idYoutube = (s) => { const m = String(s || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }; // accepte une adresse complète
   const PARTAGES = new Set(['image', 'lien', 'n', 'instrumental', 'paysage', 'date', 'langue']);
   const CACHES = new Set(['_note', 'langue', 'n']);
   const LONGS = new Set(['resume', 'texte', 'intro', 'paroles', 'p', 'kolam_txt', 'meta_description', 'sous_titre', 'detail', 'image_alt', 'sens']);
@@ -115,6 +125,8 @@
     for (const [k, v] of Object.entries(fr)) {
       if (CACHES.has(k) && k !== 'n') continue;
       if (Array.isArray(v)) {
+        const cles = [...new Set(v.flatMap((x) => (estObjet(x) ? Object.keys(x) : [])))]; // toutes les fiches d'une liste ont les mêmes champs (ex. une photo pour chaque offre)
+        for (const x of v) if (estObjet(x)) for (const c of cles) if (!(c in x)) x[c] = squelette(v.find((y) => estObjet(y) && c in y)[c]);
         if (!Array.isArray(en[k])) en[k] = [];
         while (en[k].length < v.length) en[k].push(estObjet(v[0]) ? squelette(v[0]) : '');
         v.forEach((x, i) => { if (estObjet(x)) aligner(x, en[k][i]); });
@@ -154,7 +166,7 @@
     try {
       const d = JSON.parse(b);
       if (JSON.stringify(d.sha) === JSON.stringify(S.sha)) {
-        S.docs = d.docs; S.brouillonOk = true; let perdues = 0;
+        S.docs = d.docs; S.brouillonOk = true; let perdues = 0; aligner(S.docs.fr, S.docs.en);
         (function oublier(o) { // les photos choisies mais jamais publiées ne survivent pas à un rechargement de la page
           if (Array.isArray(o)) o.forEach(oublier);
           else if (estObjet(o)) { if (o.image && !S.imgs.has(o.image)) { o.image = null; perdues++; } Object.values(o).forEach(oublier); }
@@ -269,6 +281,7 @@
       if (Array.isArray(v)) { conteneur.append(rendreListe(cle, fr, en, chem, nom)); continue; }
       if (estObjet(v)) { conteneur.append(h('h3', {}, nom)); const g = h('div', {}); rendreObjet(g, v, en[cle], [...chem, cle]); conteneur.append(g); continue; }
       if (cle === 'image') { conteneur.append(rendrePhoto(fr, en)); continue; }
+      if (cle === 'lien' && 'image' in fr && 'infos' in fr) { conteneur.append(rendreVideo(fr, en)); continue; } // film : on colle l'adresse YouTube
       if (cle === 'lien' && 'image' in fr) { conteneur.append(rendreLien(fr, en)); continue; } // « lien » = clé de la page Liens (livres, films) ; ailleurs c'est un texte
       if (typeof v === 'boolean' || cle === 'instrumental' || cle === 'paysage') { conteneur.append(rendreCase(cle, fr, en, nom)); continue; }
       if (PARTAGES.has(cle) && cle !== 'lien') { // champ partagé (ex. date) : un seul champ, écrit dans les deux langues
@@ -293,6 +306,19 @@
     sel.value = fr.lien || '';
     sel.addEventListener('change', () => { fr.lien = sel.value || null; en.lien = sel.value || null; modifie(); });
     return h('div', {}, h('label', {}, 'Lien associé'), sel, h('p', { class: 'doux' }, "L'adresse elle-même se règle dans la page « Liens »."));
+  }
+  function rendreVideo(fr, en) { // vidéo YouTube d'un film : l'éditeur crée tout seul le lien dans la page « Liens »
+    const L = S.docs.liens, id = 'c' + (++idn);
+    const champ = champTexte(fr.lien && L[fr.lien] ? L[fr.lien] : '', false, () => {}, id);
+    champ.placeholder = 'Colle ici l\'adresse de la vidéo YouTube';
+    const appliquer = () => {
+      const v = idYoutube(champ.value) || champ.value.trim();
+      if (!v) { fr.lien = null; en.lien = null; modifie(); return; }
+      let cle = fr.lien; if (!cle) { cle = 'youtube_' + slug(fr.titre || 'film').replace(/-/g, '_'); while (cle in L && L[cle]) cle += '_2'; }
+      L[cle] = v; fr.lien = cle; en.lien = cle; LIENS_ETIQ[cle] = 'YouTube : ' + (fr.titre || 'film'); champ.value = v; modifie();
+    };
+    champ.addEventListener('input', appliquer);
+    return h('div', {}, h('label', { for: id }, 'Vidéo YouTube de ce film'), champ, h('p', { class: 'doux' }, 'Laisse vide s\'il n\'y a pas encore de vidéo : aucun bouton ne s\'affiche. Sinon un bouton « YouTube » apparaît sous le texte.'));
   }
   function urlPhoto(nom) { const f = S.staged.get('img/' + nom); return f ? f.url : '../img/' + encodeURIComponent(nom); }
   function rendrePhoto(fr, en) {
@@ -366,7 +392,9 @@
       for (const k of Object.keys(L)) {
         if (k.startsWith('_')) continue;
         const id = 'c' + (++idn);
-        main.append(h('label', { for: id }, LIENS_ETIQ[k] || etiquette(k)), champTexte(L[k], false, (v) => { L[k] = v || null; }, id));
+        const champ = champTexte(L[k], false, (v) => { L[k] = v || null; }, id);
+        if (k.startsWith('youtube')) champ.addEventListener('change', () => { const y = idYoutube(champ.value); if (y) { champ.value = y; L[k] = y; modifie(); } }); // adresse complète acceptée
+        main.append(h('label', { for: id }, LIENS_ETIQ[k] || etiquette(k)), champ);
       }
       main.append(h('p', { class: 'doux' }, 'Laisse vide si tu n\'as pas encore le lien : le site affichera « Bientôt ». YouTube : seulement les 11 caractères après « v= ».'),
         h('div', { class: 'outils' }, h('button', { onclick: async () => {
