@@ -3,16 +3,14 @@
 html,body{height:100%}
 .scene{position:fixed;inset:0;overflow:hidden}
 #dessin{position:absolute;display:block;overflow:hidden}
-/* Apparition : un voile de la couleur du fond se dissipe par-dessus l'ange. Un fondu d'opacité sur le dessin lui-même ferait ressortir
-   d'un niveau de gris ses aplats (carré autour de l'ange, barre en bas). */
-#voile{position:absolute;inset:0;background:var(--bg);pointer-events:none;animation:disparait 1.6s ease-out .1s forwards}
-@keyframes disparait{to{opacity:0;visibility:hidden}}
+/* Pas de fondu d'opacité sur le dessin ni sur les disques de fond des icônes : sur un fond à 10,10,10, l'arrondi du fondu les fait passer à 9
+   (carré autour de l'ange, barre en bas, fond qui « clignote » pendant le chargement). Seuls le trait des icônes et le texte des libellés apparaissent en fondu. */
 #dessin .nom-arc{fill:var(--ink);font-weight:600;font-family:var(--texte);letter-spacing:.2em;transition:fill .6s ease}
 #lien-oriana:hover .nom-arc,#lien-oriana:focus-visible .nom-arc{fill:var(--or)}
 #lien-oriana:focus-visible{outline:none}
 #lien-oriana:focus-visible .cible{stroke:var(--or);stroke-width:2}
 .symbole{position:absolute;width:calc(var(--sym) + 56px);margin-left:calc((var(--sym) + 56px) / -2);margin-top:calc(var(--sym) / -2);
-  display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;color:var(--ink);opacity:0;animation:apparait 1s ease-out forwards;border-radius:12px}
+  display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;color:var(--ink);border-radius:12px}
 .symbole .icone{width:var(--sym);height:var(--sym);display:grid;place-items:center;transition:filter .6s ease,transform .6s ease;
   background:radial-gradient(closest-side,rgba(var(--bg-rgb),.92) 62%,rgba(var(--bg-rgb),0));border-radius:50%}
 .symbole img{width:100%;height:100%;object-fit:contain;display:block}
@@ -21,7 +19,10 @@ html,body{height:100%}
 .symbole:hover .icone,.symbole:focus-visible .icone{filter:drop-shadow(0 0 10px rgba(var(--or-rgb),.55));transform:scale(1.06)}
 .symbole:hover .libelle,.symbole:focus-visible .libelle{border-color:var(--or)}
 .symbole:focus-visible{outline:1px solid var(--or);outline-offset:3px}
-.symbole.vu{animation:none;opacity:1}
+.symbole img{opacity:0;animation:apparait 1s ease-out forwards;animation-delay:inherit}
+.symbole .libelle{animation:texte 1s ease-out both;animation-delay:inherit}
+.symbole.vu img{animation:none;opacity:1}.symbole.vu .libelle{animation:none}
+@keyframes texte{from{color:transparent}}
 @keyframes apparait{to{opacity:1}}
 @media (max-width:699px){.symbole{gap:1px}.symbole .libelle{font-size:11px;letter-spacing:.1em}}
-@media (prefers-reduced-motion:reduce){#voile{display:none}.symbole{animation:none;opacity:1}.symbole .icone{transition:none}}
+@media (prefers-reduced-motion:reduce){.symbole img{animation:none;opacity:1}.symbole .libelle{animation:none}.symbole .icone{transition:none}}
