@@ -2,7 +2,11 @@
 :root{--sym-defaut:clamp(54px,4.8vw,74px);--sym:var(--sym-defaut)}
 html,body{height:100%}
 .scene{position:fixed;inset:0;overflow:hidden}
-#dessin{position:absolute;display:block;overflow:hidden;opacity:0;animation:apparait 1.6s ease-out .1s forwards}
+#dessin{position:absolute;display:block;overflow:hidden}
+/* Apparition : un voile de la couleur du fond se dissipe par-dessus l'ange. Un fondu d'opacité sur le dessin lui-même ferait ressortir
+   d'un niveau de gris ses aplats (carré autour de l'ange, barre en bas). */
+#voile{position:absolute;inset:0;background:var(--bg);pointer-events:none;animation:disparait 1.6s ease-out .1s forwards}
+@keyframes disparait{to{opacity:0;visibility:hidden}}
 #dessin .nom-arc{fill:var(--ink);font-weight:600;font-family:var(--texte);letter-spacing:.2em;transition:fill .6s ease}
 #lien-oriana:hover .nom-arc,#lien-oriana:focus-visible .nom-arc{fill:var(--or)}
 #lien-oriana:focus-visible{outline:none}
@@ -20,4 +24,4 @@ html,body{height:100%}
 .symbole.vu{animation:none;opacity:1}
 @keyframes apparait{to{opacity:1}}
 @media (max-width:699px){.symbole{gap:1px}.symbole .libelle{font-size:11px;letter-spacing:.1em}}
-@media (prefers-reduced-motion:reduce){#dessin,.symbole{animation:none;opacity:1}.symbole .icone{transition:none}}
+@media (prefers-reduced-motion:reduce){#voile{display:none}.symbole{animation:none;opacity:1}.symbole .icone{transition:none}}
