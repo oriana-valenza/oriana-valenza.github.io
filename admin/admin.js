@@ -6,7 +6,7 @@
   'use strict';
   const PROPRIO = 'oriana-valenza', DEPOT = 'oriana-valenza.github.io', PRINCIPALE = 'main';
   const R = `/repos/${PROPRIO}/${DEPOT}`;
-  const LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+  const LOCAL = location.hostname === 'localhost';
   const API = (LOCAL && new URLSearchParams(location.search).get('api')) || 'https://api.github.com'; // redirection permise seulement en local (tests)
   const FICHIERS = { fr: 'donnees/fr.json', en: 'donnees/en.json', liens: 'donnees/liens.json', 'bio-fr': 'donnees/bio-fr.md', 'bio-en': 'donnees/bio-en.md', contacts: '.github/contacts_autorises.txt' };
   const JSONS = ['fr', 'en', 'liens'];
