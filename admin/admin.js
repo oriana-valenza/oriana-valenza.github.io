@@ -8,8 +8,9 @@
   const R = `/repos/${PROPRIO}/${DEPOT}`;
   const LOCAL = location.hostname === 'localhost';
   const API = (LOCAL && new URLSearchParams(location.search).get('api')) || 'https://api.github.com'; // redirection permise seulement en local (tests)
-  const FICHIERS = { fr: 'donnees/fr.json', en: 'donnees/en.json', liens: 'donnees/liens.json', 'bio-fr': 'donnees/bio-fr.md', 'bio-en': 'donnees/bio-en.md', contacts: '.github/contacts_autorises.txt' };
-  const JSONS = ['fr', 'en', 'liens'];
+  const FICHIERS = { fr: 'donnees/fr.json', en: 'donnees/en.json', liens: 'donnees/liens.json', 'bio-fr': 'donnees/bio-fr.md', 'bio-en': 'donnees/bio-en.md', theme: 'donnees/theme.json', contacts: '.github/contacts_autorises.txt' };
+  const JSONS = ['fr', 'en', 'liens', 'theme'];
+  const CSS_THEME = 'css/theme.css'; // généré à partir de donnees/theme.json à chaque publication (jamais saisi à la main)
   const RE_MAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
   const RE_TEL = /(^|[^0-9.,/-])(((\+ ?33|0033)[ .-]?[1-9]|0[1-9])([ .-]?[0-9]{2}){4}|\+ ?[0-9]{1,3}([ .-]?[0-9]{2,4}){3,})(?=[^0-9]|$)/g;
   const RE_SECRET = /(password|passwd|mot de passe|secret|token|api[_-]?key)[^A-Za-z0-9]{0,3}[:=][^\]A-Za-z0-9]{0,3}[A-Za-z]*[0-9_/+-][A-Za-z0-9_/+-]{4,}/i;
@@ -17,8 +18,49 @@
   const MAX_TEXTE = 6000;
 
   /* ---------- Libellés en français ---------- */
-  const { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC } = window.LIBELLES; // voir libelles.js
+  const { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS } = window.LIBELLES; // voir libelles.js
   const idYoutube = (s) => { const m = String(s || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }; // accepte une adresse complète
+
+  /* ---------- Thème : couleurs, contraste, génération de css/theme.css ---------- */
+  const HEX = /^#[0-9A-Fa-f]{6}$/;
+  const ENTETE_CSS = "/* Thème : écrit par l'éditeur d'apparence. Ne contient que des lignes --variable:valeur. Vide = thème d'origine (voir :root de base.css). */\n";
+  const rgb = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+  const versHex = (a) => '#' + a.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('').toUpperCase();
+  const melange = (a, b, t) => { const x = rgb(a), y = rgb(b); return versHex(x.map((v, i) => v + (y[i] - v) * t)); };
+  const luminance = (c) => { const [r, g, b] = rgb(c).map((v) => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }); return .2126 * r + .7152 * g + .0722 * b; };
+  const contraste = (a, b) => { const x = luminance(a), y = luminance(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+  const DEF = Object.fromEntries(COULEURS.map((c) => [c.cle, c.def.toUpperCase()]));
+  const couleursDe = (t) => { const c = (t && t.couleurs) || {}; return Object.fromEntries(COULEURS.map((x) => [x.cle, HEX.test(c[x.cle] || '') ? c[x.cle].toUpperCase() : DEF[x.cle]])); };
+  const couleursTheme = () => couleursDe(S.docs.theme);
+  const derivees = (c) => ({ // variantes calculées ; valeur d'origine conservée tant que la couleur de base n'est pas changée
+    ligne2: c.ligne === DEF.ligne ? '#3A3A3A' : melange(c.ligne, c.ink, .08),
+    'accent-clair': c.rouge === DEF.rouge ? '#D6666A' : melange(c.rouge, '#FFFFFF', .3),
+    'or-clair': c.or === DEF.or ? '#D9BE84' : melange(c.or, '#FFFFFF', .3),
+    'or-pale': c.or === DEF.or ? '#F4E6C2' : melange(c.or, '#FFFFFF', .75),
+    'or-reflet': c.or === DEF.or ? '#E6D3A3' : melange(c.or, '#FFFFFF', .5) });
+  function cssTheme(c) { // seules les valeurs changées sont écrites ; rien d'autre que --variable:valeur
+    const d = derivees(c), lignes = [];
+    for (const x of COULEURS) if (c[x.cle] !== DEF[x.cle]) {
+      lignes.push(`--${x.cle}:${c[x.cle]};`);
+      if (['bg', 'or', 'rouge'].includes(x.cle)) lignes.push(`--${x.cle}-rgb:${rgb(c[x.cle]).join(',')};`);
+      if (x.cle === 'ligne') lignes.push(`--ligne2:${d.ligne2};`);
+      if (x.cle === 'rouge') lignes.push(`--accent-clair:${d['accent-clair']};`);
+      if (x.cle === 'or') lignes.push(`--or-clair:${d['or-clair']};`, `--or-pale:${d['or-pale']};`, `--or-reflet:${d['or-reflet']};`);
+    }
+    return ENTETE_CSS + (lignes.length ? ':root{\n' + lignes.join('\n') + '\n}\n' : '');
+  }
+  function problemesContraste(c) { // bloquant à la publication : le site doit rester lisible
+    const d = derivees(c), p = [];
+    const t = (a, b, min, msg) => { const v = contraste(a, b); if (v < min) p.push(`${msg} (contraste ${v.toFixed(1)}, il faut au moins ${min}).`); };
+    t(c.ink, c.bg, 4.5, 'Le texte principal serait difficile à lire sur le fond');
+    t(c.muted, c.bg, 4.5, 'Le texte discret serait difficile à lire sur le fond');
+    t(c.ink, c.surface, 4.5, 'Le texte principal serait difficile à lire sur le fond des cartes');
+    t(c.muted, c.surface, 4.5, 'Le texte discret serait difficile à lire sur le fond des cartes');
+    t(c.or, c.bg, 3, "L'or serait difficile à voir sur le fond");
+    t(c.rouge, c.bg, 2.5, 'Le rouge serait difficile à voir sur le fond');
+    t(d['accent-clair'], c.bg, 4.5, 'Le texte en rouge clair (étiquettes) serait difficile à lire sur le fond');
+    return p;
+  }
 
   /* ---------- Outils ---------- */
   const S = { jeton: null, expire: null, docs: {}, base: {}, sha: {}, imgs: new Set(), staged: new Map(), annuler: null, brouillonOk: false };
@@ -167,6 +209,11 @@
   function resumerChangements() {
     const lignes = [];
     for (const k of changes()) {
+      if (k === 'theme') { // une ligne par couleur changée, avec son nom
+        const a = couleursDe(JSON.parse(S.baseSer.theme)), b = couleursTheme();
+        for (const x of COULEURS) if (a[x.cle] !== b[x.cle]) lignes.push({ txt: 'Apparence › ' + x.nom, type: 'modifié', avant: a[x.cle], apres: b[x.cle] });
+        continue;
+      }
       if (!JSONS.includes(k)) { lignes.push({ txt: k === 'contacts' ? 'Liste des contacts voulus sur le site' : 'Biographie' + (k === 'bio-en' ? ' (anglais)' : ''), type: 'modifié' }); continue; }
       const avant = aplatir(JSON.parse(S.baseSer[k])), apres = aplatir(nettoyer(S.docs[k]));
       for (const c of new Set([...Object.keys(avant), ...Object.keys(apres)])) {
@@ -229,6 +276,9 @@
       else if (c.startsWith('youtube')) { if (!/^[\w-]{11}$/.test(v)) erreurs.push(`Liens › ${LIENS_ETIQ[c] || c} : l'identifiant YouTube a 11 caractères (la fin de l'adresse après « v= »).`); }
       else if (!['dates_concert', 'lieu_concert'].includes(c) && !/^https:\/\/\S+$/.test(v)) erreurs.push(`Liens › ${LIENS_ETIQ[c] || c} : l'adresse doit commencer par https://`);
     }
+    const th = (S.docs.theme && S.docs.theme.couleurs) || {};
+    for (const x of COULEURS) if (th[x.cle] != null && !HEX.test(th[x.cle])) erreurs.push(`Apparence › ${x.nom} : code de couleur invalide (il faut # puis 6 chiffres ou lettres A à F, par exemple #B8975A).`);
+    if (!erreurs.some((e) => e.startsWith('Apparence'))) for (const m of problemesContraste(couleursTheme())) erreurs.push('Apparence : ' + m);
     // traductions manquantes (non bloquant)
     let manque = 0;
     const flFr = aplatir(nettoyer(S.docs.fr)), flEn = aplatir(nettoyer(S.docs.en));
@@ -387,6 +437,8 @@
           h('div', { class: 'outils' }, h('button', { class: 'petit danger', onclick: async () => { if (await confirmer('Supprimer ce réseau ?', 'Il disparaîtra du bas des pages quand tu publieras.', 'Supprimer')) { L.reseaux.splice(i, 1); modifie(); rendu(); } } }, 'Supprimer'))));
       });
       main.append(h('div', { class: 'outils' }, h('button', { onclick: () => { L.reseaux.push({ nom: null, url: null }); modifie(); rendu(); } }, '+ Ajouter un lien (réseau, site…)')));
+    } else if (sec.special === 'apparence') {
+      rendreApparence(main);
     } else if (sec.special === 'bio') {
       main.append(h('p', { class: 'doux' }, 'Un paragraphe = un bloc, séparé du suivant par une ligne vide.'),
         h('div', { class: 'duo deux' },
@@ -402,7 +454,7 @@
     }
     main.append(h('div', { class: 'outils', style: 'margin-top:2rem' }, h('button', { class: 'danger', onclick: async () => {
       if (!(await confirmer('Remettre comme en ligne ?', 'Tes modifications non publiées de cette page seront effacées.', 'Remettre'))) return;
-      const cles = sec.special === 'liens' ? ['liens'] : sec.special === 'bio' ? ['bio-fr', 'bio-en'] : null;
+      const cles = sec.special === 'liens' ? ['liens'] : sec.special === 'apparence' ? ['theme'] : sec.special === 'bio' ? ['bio-fr', 'bio-en'] : null;
       if (cles) cles.forEach((k) => { S.docs[k] = JSONS.includes(k) ? JSON.parse(S.baseSer[k]) : S.baseSer[k]; });
       else { const fr = JSON.parse(S.baseSer.fr), en = JSON.parse(S.baseSer.en); for (const c of sec.cles) { S.docs.fr[c] = fr[c]; S.docs.en[c] = en[c]; } }
       modifie(); rendu();
@@ -419,6 +471,7 @@
   function majBarre() { /* le décompte se met à jour au retour au menu */ }
   function compteSection(sec) {
     if (sec.special === 'liens') return eff('liens') !== effBase('liens') ? 1 : 0;
+    if (sec.special === 'apparence') return eff('theme') !== effBase('theme') ? 1 : 0;
     if (sec.special === 'bio') return ['bio-fr', 'bio-en'].filter((k) => eff(k) !== effBase(k)).length;
     let n = 0; const a = JSON.parse(S.baseSer.fr), b = JSON.parse(S.baseSer.en);
     for (const c of sec.cles) {
@@ -427,6 +480,44 @@
     return n;
   }
   const diffCompte = (a, b) => { const x = aplatir(a ?? {}), y = aplatir(b ?? {}); let n = 0; for (const k of new Set([...Object.keys(x), ...Object.keys(y)])) if (JSON.stringify(x[k] ?? null) !== JSON.stringify(y[k] ?? null)) n++; return n; };
+
+  function fixerCouleur(cle, valeur) { // ne garde dans theme.json que les couleurs différentes de l'origine
+    const T = S.docs.theme = estObjet(S.docs.theme) ? S.docs.theme : {};
+    const c = estObjet(T.couleurs) ? T.couleurs : {};
+    if (HEX.test(valeur) && valeur.toUpperCase() === DEF[cle]) delete c[cle]; else c[cle] = valeur;
+    if (Object.keys(c).length) T.couleurs = c; else delete T.couleurs;
+  }
+  function rendreApparence(main) {
+    main.append(h('p', {}, "Choisis les couleurs du site. Les dessins (ange, symboles) gardent leur forme ; seules leurs couleurs suivent. Rien ne change sur le site tant que tu n'as pas publié."));
+    const apercu = h('div', { class: 'carte', id: 'apercu-theme' }), etat = h('div', { id: 'etat-theme' }), champs = [];
+    const maj = () => {
+      const c = couleursTheme(), p = problemesContraste(c);
+      apercu.replaceChildren(h('strong', {}, 'Oriana Valenza'), h('p', {}, 'Texte principal : voici à quoi ressemblera ton site.'), h('p', {}, 'Texte discret : sous-titres et légendes.'),
+        h('div', {}, 'Une carte (livre, offre)'), h('span', {}, 'Or'), ' · ', h('span', {}, 'Rouge'));
+      const [t, tp, tm, carte, o, , r] = apercu.childNodes, st = (e, k, v) => e.style.setProperty(k, v);
+      st(apercu, 'background', c.bg); st(apercu, 'border', '1px solid ' + c.ligne); st(apercu, 'padding', '1rem'); st(t, 'color', c.ink); st(t, 'font-size', '1.3rem'); st(tp, 'color', c.ink); st(tm, 'color', c.muted);
+      st(carte, 'background', c.surface); st(carte, 'color', c.ink); st(carte, 'border', '1px solid ' + c.ligne); st(carte, 'padding', '.6rem'); st(carte, 'border-radius', '.5rem'); st(carte, 'margin', '.5rem 0');
+      st(o, 'color', c.or); st(o, 'font-weight', '700'); st(r, 'color', c.rouge); st(r, 'font-weight', '700');
+      etat.replaceChildren(p.length ? h('div', {}, h('p', { class: 'erreur' }, 'À corriger avant de publier :'), h('ul', { class: 'liste' }, p.map((x) => h('li', { class: 'erreur' }, x)))) : h('p', { class: 'ok' }, 'Lisibilité : bonne.'));
+      for (const f of champs) f();
+    };
+    main.append(apercu, etat);
+    for (const x of COULEURS) {
+      const id = 'col-' + x.cle, sel = h('input', { type: 'color', id, 'aria-label': x.nom }), code = h('input', { type: 'text', id: id + '-code', maxlength: '7', autocapitalize: 'off', spellcheck: 'false', 'aria-label': x.nom + ' (code)' });
+      const sync = () => { const v = couleursTheme()[x.cle]; sel.value = v.toLowerCase(); if (document.activeElement !== code) code.value = v; };
+      champs.push(sync); sync();
+      sel.addEventListener('input', () => { fixerCouleur(x.cle, sel.value.toUpperCase()); modifie(); maj(); });
+      code.addEventListener('input', () => { const v = code.value.trim(); if (HEX.test(v)) { fixerCouleur(x.cle, v.toUpperCase()); modifie(); maj(); } });
+      code.addEventListener('blur', () => { code.value = couleursTheme()[x.cle]; });
+      main.append(h('label', { for: id }, x.nom), h('p', { class: 'doux' }, x.ou), h('div', { class: 'outils' }, sel, code,
+        h('button', { class: 'petit', onclick: () => { fixerCouleur(x.cle, DEF[x.cle]); modifie(); maj(); } }, "Couleur d'origine (" + DEF[x.cle] + ')')));
+    }
+    main.append(h('div', { class: 'outils' }, h('button', { class: 'danger', onclick: async () => {
+      if (!(await confirmer("Remettre le thème d'origine ?", "Toutes les couleurs reviennent à celles du départ (rien n'est publié tant que tu ne publies pas).", "Remettre le thème d'origine"))) return;
+      S.docs.theme = {}; modifie(); rendu();
+    } }, "Remettre le thème d'origine")));
+    maj();
+  }
 
   function bandeauJeton() {
     const b = $('#bandeau'); b.replaceChildren();
@@ -556,7 +647,9 @@
         S.docs.contacts = (String(S.docs.contacts || '').replace(/\s*$/, '\n') + `${c.valeur} | ${champ.value.replace(/[|\n]/g, ' ').trim() || 'contact'}\n`);
       }
       const modifs = [];
-      for (const k of changes()) modifs.push({ cle: k, chemin: FICHIERS[k], contenu: ser(k) });
+      const ch = changes();
+      for (const k of ch) modifs.push({ cle: k, chemin: FICHIERS[k], contenu: ser(k) });
+      if (ch.includes('theme')) modifs.push({ chemin: CSS_THEME, contenu: cssTheme(couleursTheme()) }); // feuille de style générée : jamais saisie à la main
       const utilisees = new Set(JSON.stringify([S.docs.fr, S.docs.en]).match(/[^"\\]+\.webp/g) || []);
       for (const [p, f] of S.staged) if (utilisees.has(p.slice(4))) modifs.push({ chemin: p, contenu: new Uint8Array(await f.blob.arrayBuffer()) });
       const tete = await pipeline(modifs, 'Mise à jour du site depuis l\'éditeur', progres);
@@ -623,7 +716,7 @@
     const progres = h('ul', { class: 'liste' }); $('#ecran').replaceChildren(h('h2', {}, 'Retour à une ancienne version'), progres); barre(null);
     try {
       const modifs = [];
-      for (const [k, chem] of Object.entries(FICHIERS)) {
+      for (const [k, chem] of Object.entries({ ...FICHIERS, themecss: CSS_THEME })) {
         const ancien = await lireFichier(chem, p.sha); if (!ancien) continue; // fichier qui n'existait pas encore : on n'y touche pas
         const actuel = await lireFichier(chem);
         if (actuel && actuel.texte === ancien.texte) continue;

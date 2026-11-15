@@ -98,6 +98,12 @@ controle() { # $1 = dossier
     printf '%s\n' "$txt" | grep -qE "$RE_JETON" && { echo "== PDF contenant un jeton : ${f#$dir/}"; rc=1; }
   done < <(find "$dir" -not -path "$dir/.git/*" -type f -iname '*.pdf')
 
+  # 6. Feuille de style du thème (écrite par l'éditeur d'apparence) : seulement des lignes --variable:valeur dans :root{ }
+  if [ -f "$dir/css/theme.css" ]; then
+    out=$(sed -E 's#/\*.*\*/##g' "$dir/css/theme.css" | tr -d '\r' | grep -vE '^[[:space:]]*$' | grep -vE '^:root\{$|^\}$|^--[a-z0-9-]+:(#[0-9A-Fa-f]{6}|[0-9]{1,3},[0-9]{1,3},[0-9]{1,3});$' | head -5)
+    if [ -n "$out" ]; then echo "== css/theme.css : contenu non autorisé (seules les lignes --variable:#RRGGBB; sont permises)"; echo "$out"; rc=1; fi
+  fi
+
   [ $rc -eq 0 ] && echo "OK : rien de suspect détecté (relire le diff quand même)."
   return $rc
 }
@@ -105,7 +111,7 @@ controle() { # $1 = dossier
 autotest() {
   local t ok=0 faux c
   t=$(mktemp -d) || exit 2
-  for d in propre mail tel1 tel2 tel3 jeton fichier/references ok_mail ok_tel autre_tel; do mkdir -p "$t/$d/.github"; done
+  for d in propre mail tel1 tel2 tel3 jeton fichier/references ok_mail ok_tel autre_tel theme_ok theme_url theme_import theme_bloc; do mkdir -p "$t/$d/.github"; done
   printf '<p>Un texte.</p>\n<path d="M63.89 75.09L63.89 75.09Q62.12 75.09 60.33 74.15"/>\n' > "$t/propre/a.html"
   echo "ecrire a prenom.nom@exemple.org" > "$t/mail/a.md"
   echo "appeler le 06 12 34 56 78" > "$t/tel1/a.md"
@@ -116,10 +122,15 @@ autotest() {
   echo "contact: pro@exemple.org" > "$t/ok_mail/a.md"; printf '# liste\npro@exemple.org | contact pro\n' > "$t/ok_mail/.github/contacts_autorises.txt"
   echo "tel: +33 6 12 34 56 78" > "$t/ok_tel/a.md"; printf '06 12 34 56 78 | contact pro\n' > "$t/ok_tel/.github/contacts_autorises.txt"
   echo "tel: 07 98 76 54 32" > "$t/autre_tel/a.md"; printf '06 12 34 56 78 | contact pro\n' > "$t/autre_tel/.github/contacts_autorises.txt"
-  for c in propre ok_mail ok_tel; do
+  mkdir -p "$t/theme_ok/css" "$t/theme_url/css" "$t/theme_import/css" "$t/theme_bloc/css"
+  printf '/* theme */\n:root{\n--bg:#112233;\n--bg-rgb:17,34,51;\n}\n' > "$t/theme_ok/css/theme.css"
+  printf ':root{\n--bg:url(https://exemple.org/x.png);\n}\n' > "$t/theme_url/css/theme.css"
+  printf '@import "https://exemple.org/x.css";\n' > "$t/theme_import/css/theme.css"
+  printf 'body{display:none}\n' > "$t/theme_bloc/css/theme.css"
+  for c in propre ok_mail ok_tel theme_ok; do
     controle "$t/$c" >/dev/null; [ $? -eq 0 ] && echo "PASS négatif : $c accepté" || { echo "FAIL négatif : $c refusé à tort"; ok=1; }
   done
-  for c in mail tel1 tel2 tel3 jeton fichier autre_tel; do
+  for c in mail tel1 tel2 tel3 jeton fichier autre_tel theme_url theme_import theme_bloc; do
     controle "$t/$c" >/dev/null; [ $? -eq 1 ] && echo "PASS positif : $c bloqué" || { echo "FAIL positif : $c NON détecté"; ok=1; }
   done
   rm -rf "$t"; exit $ok

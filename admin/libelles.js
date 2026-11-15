@@ -12,6 +12,17 @@ window.LIBELLES = (() => {
     { id: 'ui', titre: 'Petits textes du site', aide: 'Bas de page, boutons, menu, messages', cles: ['ui', 'nav', 'page_404'] },
     { id: 'liens', titre: 'Liens', aide: 'YouTube, Spotify, Amazon, réseaux', special: 'liens' },
     { id: 'bio', titre: 'Biographie', aide: 'Le texte de présentation', special: 'bio' },
+    { id: 'apparence', titre: 'Apparence : couleurs', aide: 'Les couleurs de tout le site', special: 'apparence' },
+  ];
+  // Couleurs du thème (donnees/theme.json). Chaque ligne dit où la couleur apparaît ; « def » = valeur d'origine (:root de css/base.css).
+  const COULEURS = [
+    { cle: 'bg', def: '#0A0A0A', nom: 'Fond du site', ou: 'Le fond de toutes les pages et du menu.' },
+    { cle: 'surface', def: '#151515', nom: 'Fond des cartes', ou: 'Les encadrés et cartes (livres, offres, titres de l\'EP).' },
+    { cle: 'ligne', def: '#2A2A2A', nom: 'Traits et séparations', ou: 'Les filets fins entre les blocs et autour des cartes.' },
+    { cle: 'ink', def: '#F2EFEA', nom: 'Texte principal et dessin de l\'ange', ou: 'Les textes, les titres et le trait blanc de l\'ange.' },
+    { cle: 'muted', def: '#B9B4AB', nom: 'Texte discret', ou: 'Les sous-titres, légendes et menu de langue (FR / EN).' },
+    { cle: 'or', def: '#B8975A', nom: 'Or', ou: 'L\'auréole, les liens survolés et les accents des pages Musique, Services et Oriana.' },
+    { cle: 'rouge', def: '#A8292E', nom: 'Rouge', ou: 'La rose, le cœur et les accents des pages Écriture et Audiovisuel.' },
   ];
   // Règle de couleur : ROUGE = titre d'un bloc de la page (dans l'ordre du site) ; NOIR = les champs à l'intérieur.
   const GOOGLE = { titre: 'Pour Google et le partage', cles: ['meta_titre', 'meta_description'] };
@@ -90,5 +101,5 @@ window.LIBELLES = (() => {
       titres_h: 'Titre de la liste des titres', clip_bientot: 'Texte dans le cadre vide du clip (avant la vidéo)', credit_label: 'Rôle du crédit (ex. Arrangeur-piano)', credit: 'Nom du crédit' },
     services: { contact_txt: 'Texte du contact (par exemple ton adresse e-mail professionnelle)', contact_form: 'Phrase sur le formulaire de contact', plaquette: 'Phrase sur la plaquette de services' },
   };
-  return { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC };
+  return { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS };
 })();
