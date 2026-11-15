@@ -135,7 +135,8 @@
     const b = lire('ov_brouillon'); if (!b) return;
     try {
       const d = JSON.parse(b);
-      if (JSON.stringify(d.sha) === JSON.stringify(S.sha)) {
+      const canon = (o) => JSON.stringify(Object.keys(FICHIERS).map((k) => (o || {})[k] ?? null)); // ordre fixe : les fichiers arrivent dans un ordre variable
+      if (canon(d.sha) === canon(S.sha)) {
         S.docs = d.docs; S.brouillonOk = true; let perdues = 0; aligner(S.docs.fr, S.docs.en);
         (function oublier(o) { // les photos choisies mais jamais publiées ne survivent pas à un rechargement de la page
           if (Array.isArray(o)) o.forEach(oublier);
@@ -210,8 +211,8 @@
         if (Array.isArray(o)) o.forEach((x, i) => parcourir(x, [...ch, i]));
         else if (estObjet(o)) {
           for (const cle of ['titre', 'h']) if (k === 'fr' && cle in o && !(o[cle] || '').trim()) erreurs.push(`${nomChemin(k, [...ch, cle])} : le titre ne peut pas être vide.`);
-          if (k === 'fr' && o.billets && !/^https:\/\/\S+$/.test(o.billets)) erreurs.push(`${nomChemin(k, [...ch, 'billets'])} : l'adresse doit commencer par https://`);
-          if (k === 'fr' && 'youtube' in o && o.youtube && !/^[\w-]{11}$/.test(o.youtube)) erreurs.push(`${nomChemin(k, [...ch, 'youtube'])} : colle l'adresse de la vidéo YouTube (ou ses 11 caractères).`);
+          if (k === 'fr' && typeof ch[ch.length - 1] === 'number' && o.billets && !/^https:\/\/\S+$/.test(o.billets)) erreurs.push(`${nomChemin(k, [...ch, 'billets'])} : l'adresse doit commencer par https://`);
+          if (k === 'fr' && typeof ch[ch.length - 1] === 'number' && 'youtube' in o && o.youtube && !/^[\w-]{11}$/.test(o.youtube)) erreurs.push(`${nomChemin(k, [...ch, 'youtube'])} : colle l'adresse de la vidéo YouTube (ou ses 11 caractères).`);
           if (k === 'fr' && o.image && !S.imgs.has(o.image) && !S.staged.has('img/' + o.image)) erreurs.push(`${nomChemin(k, [...ch, 'image'])} : cette photo n'est plus disponible, choisis-la à nouveau.`);
           if (k === 'fr' && o.image && !(o.image_alt || '').trim()) erreurs.push(`${nomChemin(k, [...ch, 'image_alt'])} : décris la photo en une phrase.`);
           if (o.lien && 'image' in o && !(o.lien in S.docs.liens)) erreurs.push(`${nomChemin(k, [...ch, 'lien'])} : ce lien n'existe pas dans la page « Liens ».`);
@@ -470,7 +471,8 @@
       h('h3', {}, 'Publication'),
       h('div', { class: 'grille' },
         h('button', { class: n ? 'primaire' : '', disabled: !n, onclick: () => montrer('publier') }, n ? 'Voir et publier mes modifications' : 'Aucune modification en attente'),
-        S.annuler && h('button', { onclick: annulerDerniere }, 'Annuler ma dernière publication')),
+        S.annuler && h('button', { onclick: annulerDerniere }, 'Annuler ma dernière publication'),
+        h('button', { onclick: ecranHistorique }, 'Voir les anciennes versions du site')),
       h('p', { class: 'doux' }, S.brouillonOk ? 'Tes modifications précédentes ont été retrouvées.' : ''),
       h('div', { class: 'outils' }, h('button', { class: 'petit', onclick: () => { ecrire('ov_jeton', null); ecrire('ov_expire', null); S.jeton = null; ecranConnexion('Colle ton NOUVEAU jeton. Tes modifications en attente sont gardées.'); } }, 'Renouveler mon jeton'),
         h('button', { class: 'petit', onclick: () => { ecrire('ov_jeton', null); ecrire('ov_expire', null); S.jeton = null; ecranConnexion('Tu es déconnectée.'); } }, 'Me déconnecter')));
@@ -507,6 +509,7 @@
       }
     }
     const branche = 'brouillon-' + horodatage();
+    message = `${message} (${branche})`; // message unique : l'historique regroupe les commits d'une même publication
     await gh(`${R}/git/refs`, { method: 'POST', body: { ref: 'refs/heads/' + branche, sha: tete } });
     etape('Brouillon créé (mode essai).');
     let dernier = null;
@@ -583,6 +586,57 @@
       await pipeline(modifs, 'Annulation de la dernière publication', progres);
       S.annuler = null; ecrire('ov_annuler', null); await charger();
       progres.append(h('li', { class: 'ok' }, 'Annulé. Le site sera à jour dans 1 à 3 minutes.'));
+    } catch (e) { progres.append(h('li', { class: 'erreur' }, e.message || String(e))); }
+    barre([{ label: 'Retour au menu', primaire: true, fn: () => montrer('accueil') }]);
+  }
+
+  /* ---------- Historique : revenir à une version précédente ---------- */
+  const MSG_PUB = /^(Mise à jour du site depuis l'éditeur|Annulation de la dernière publication|Retour à la version)/;
+  function publications(commits) { // une publication = tous les commits de même message (un par fichier envoyé, plus la fusion)
+    const sortie = [];
+    for (const c of commits) {
+      const msg = String(c.commit.message).split(/\r?\n/)[0];
+      if (!MSG_PUB.test(msg)) continue;
+      if (sortie.length && sortie[sortie.length - 1].msg === msg) continue; // le plus récent représente la publication
+      sortie.push({ sha: c.sha, msg, t: Date.parse(c.commit.committer.date) });
+    }
+    return sortie;
+  }
+  const quand = (t) => new Date(t).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
+  const genre = (msg) => (msg.startsWith('Annulation') ? 'Annulation' : msg.startsWith('Retour') ? 'Retour à une version' : 'Publication');
+  async function ecranHistorique() {
+    rendu = null; barre(null);
+    const main = $('#ecran'); const liste = h('ul', { class: 'liste', id: 'historique' });
+    main.replaceChildren(h('button', { onclick: () => montrer('accueil') }, '← Retour au menu'), h('h2', {}, 'Anciennes versions du site'),
+      h('p', { class: 'doux' }, 'Chaque ligne est une publication. « Revenir à cette version » remet le site comme il était juste après elle. Tu peux ensuite annuler ce retour.'), liste, h('p', { id: 'progres-histo' }, 'Chargement…'));
+    try {
+      const pubs = publications(await gh(`${R}/commits?sha=${PRINCIPALE}&per_page=100`));
+      $('#progres-histo').remove();
+      if (!pubs.length) { main.append(h('p', {}, "Aucune publication faite depuis l'éditeur pour l'instant.")); return; }
+      pubs.slice(0, 30).forEach((p, i) => liste.append(h('li', { class: 'ok' }, h('strong', {}, quand(p.t)), ` : ${genre(p.msg)}`,
+        i === 0 ? h('span', { class: 'doux' }, ' (version actuelle)') : h('div', { class: 'outils' }, h('button', { class: 'petit', onclick: () => revenirA(p) }, 'Revenir à cette version')))));
+    } catch (e) { $('#progres-histo').replaceChildren(h('span', { class: 'erreur' }, e.message || String(e))); }
+  }
+  async function revenirA(p) {
+    const n = changes().length, date = quand(p.t);
+    if (!(await confirmer('Revenir à cette version ?', `Le site reviendra à ce qu'il était après la publication du ${date}. ${n ? 'Tes modifications non publiées seront mises de côté. ' : ''}Tu pourras annuler ce retour avec « Annuler ma dernière publication ».`, 'Revenir à cette version'))) return;
+    const progres = h('ul', { class: 'liste' }); $('#ecran').replaceChildren(h('h2', {}, 'Retour à une ancienne version'), progres); barre(null);
+    try {
+      const modifs = [];
+      for (const [k, chem] of Object.entries(FICHIERS)) {
+        const ancien = await lireFichier(chem, p.sha); if (!ancien) continue; // fichier qui n'existait pas encore : on n'y touche pas
+        const actuel = await lireFichier(chem);
+        if (actuel && actuel.texte === ancien.texte) continue;
+        modifs.push({ chemin: chem, cle: k, sansConflit: true, contenu: ancien.texte });
+      }
+      if (!modifs.length) { progres.append(h('li', { class: 'ok' }, 'Le site est déjà dans cet état : rien à faire.')); }
+      else {
+        const tete = await pipeline(modifs, 'Retour à la version du ' + date, progres);
+        S.annuler = { tete, chemins: modifs.map((m) => m.chemin), date: new Date().toISOString() }; ecrire('ov_annuler', JSON.stringify(S.annuler));
+        S.staged.clear(); ecrire('ov_brouillon', null);
+        await charger(); S.brouillonOk = false;
+        progres.append(h('li', { class: 'ok' }, 'Le site est revenu à cette version. Il sera à jour dans 1 à 3 minutes.'));
+      }
     } catch (e) { progres.append(h('li', { class: 'erreur' }, e.message || String(e))); }
     barre([{ label: 'Retour au menu', primaire: true, fn: () => montrer('accueil') }]);
   }
