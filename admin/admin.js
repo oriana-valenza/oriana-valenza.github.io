@@ -797,9 +797,32 @@
     }
   }
 
+  async function resumeAnnulation() { // « maintenant → après l'annulation », pour chaque fichier de la publication
+    const out = [], noms = { fr: 'Textes en français', en: 'Textes en anglais', liens: 'Liens' };
+    for (const p of S.annuler.chemins) {
+      const cle = Object.keys(FICHIERS).find((k) => FICHIERS[k] === p);
+      if (!cle) continue;
+      const [maintenant, avant] = [await lireFichier(p), await lireFichier(p, S.annuler.tete)];
+      if (cle === 'theme') {
+        const A = avant ? JSON.parse(avant.texte) : {}, B = maintenant ? JSON.parse(maintenant.texte) : {};
+        const ca = couleursDe(A), cb = couleursDe(B);
+        for (const x of COULEURS) if (ca[x.cle] !== cb[x.cle]) out.push(`${x.nom} : ${cb[x.cle]} → ${ca[x.cle]}`);
+        const pa = policesDe(A), pb = policesDe(B);
+        for (const r of ROLES) if (pa[r.cle] !== pb[r.cle]) out.push(`${r.nom} : ${pb[r.cle]} → ${pa[r.cle]}`);
+        if (taillesDe(A) !== taillesDe(B)) out.push(`Taille du texte : ${taillesDe(B)} → ${taillesDe(A)}`);
+      } else if (JSONS.includes(cle)) {
+        const n = diffCompte(avant ? JSON.parse(avant.texte) : {}, maintenant ? JSON.parse(maintenant.texte) : {});
+        if (n) out.push(`${noms[cle] || cle} : ${n} changement${n > 1 ? 's' : ''} annulé${n > 1 ? 's' : ''}`);
+      } else if (!maintenant || !avant || maintenant.texte !== avant.texte) out.push(cle === 'contacts' ? 'Liste des contacts voulus' : 'Biographie' + (cle === 'bio-en' ? ' (anglais)' : ''));
+    }
+    return out;
+  }
   async function annulerDerniere() {
     if (!S.annuler) return;
-    if (!(await confirmer('Annuler ta dernière publication ?', 'Le site reviendra à ce qu\'il était juste avant (textes et photos de cette publication).', 'Annuler la publication'))) return;
+    const lignes = await resumeAnnulation().catch(() => []); // ce que l'annulation va remettre, pour que ce soit visible avant de confirmer
+    if (!(await dialogue('Annuler ta dernière publication ?', h('div', {}, h('p', {}, "Le site reviendra à ce qu'il était juste avant (textes, photos et apparence de cette publication)."),
+      lignes.length ? h('div', {}, h('p', {}, h('strong', {}, 'Ce qui sera remis comme avant :')), h('ul', { class: 'liste' }, lignes.map((l) => h('li', {}, l)))) : null),
+      [{ label: 'Non', valeur: false }, { label: 'Annuler la publication', valeur: true, primaire: true }]))) return;
     const main = $('#ecran'); const progres = h('ul', { class: 'liste' }); main.replaceChildren(h('h2', {}, 'Annulation'), progres); barre(null);
     try {
       const modifs = [];
