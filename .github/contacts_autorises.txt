@@ -1,0 +1,3 @@
+# Contacts voulus sur le site (liste blanche). VIDE au départ : elle se remplit avec l'éditeur.
+# Une ligne par contact :   valeur | étiquette      (exemple : contact@exemple.org | contact pro)
+# Les lignes qui commencent par # sont ignorées.
