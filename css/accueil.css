@@ -19,6 +19,7 @@ html,body{height:100%}
 .symbole:hover .icone,.symbole:focus-visible .icone{filter:drop-shadow(0 0 10px rgba(var(--or-rgb),.55));transform:scale(1.06)}
 .symbole:hover .libelle,.symbole:focus-visible .libelle{border-color:var(--or)}
 .symbole:focus-visible{outline:1px solid var(--or);outline-offset:3px}
+.symbole .icone{animation-delay:inherit}  /* le délai posé par accueil.js sur .symbole doit descendre jusqu'à l'image (sinon les icônes apparaissent tout de suite) */
 .symbole img{opacity:0;animation:apparait 1s ease-out forwards;animation-delay:inherit}
 .symbole .libelle{animation:texte 1s ease-out both;animation-delay:inherit}
 .symbole.vu img{animation:none;opacity:1}.symbole.vu .libelle{animation:none}
