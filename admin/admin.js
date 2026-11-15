@@ -501,8 +501,8 @@
       }
       if (!dernier) throw new Erreur("Rien n'a changé.", 'vide');
       // contrôle automatique : attendu seulement s'il est actif (débrayage possible)
-      let actif = false;
-      try { const w = await gh(`${R}/actions/workflows`); actif = (w.workflows || []).some((x) => /controle\.yml$/.test(x.path) && x.state === 'active'); } catch { actif = false; }
+      let actif = false, sansDroit = false;
+      try { const w = await gh(`${R}/actions/workflows`); actif = (w.workflows || []).some((x) => /controle\.yml$/.test(x.path) && x.state === 'active'); } catch (e) { actif = false; sansDroit = e.code === 'droit' || e.code === 'absent'; }
       if (actif) {
         etape('Contrôle de sécurité en cours…');
         const limite = Date.now() + 150000; let verdict = null;
@@ -515,7 +515,8 @@
         if (verdict === 'refus') throw new Erreur("Le contrôle de sécurité a refusé la publication (un numéro, un e-mail ou un fichier non voulu ?). Rien n'a été publié. Vérifie tes textes ou demande de l'aide.", 'controle');
         if (!verdict) throw new Erreur("Le contrôle de sécurité met trop de temps. Rien n'a été publié : réessaie dans quelques minutes.", 'delai');
         etape('Contrôle réussi.');
-      } else etape('Contrôle automatique absent ou désactivé : publication sans l\'attendre (tes textes ont déjà été vérifiés ici).');
+      } else if (sansDroit) etape('Ton jeton ne permet pas de lire le contrôle automatique (il manque « Actions » et « Checks » en lecture) : publication sans l\'attendre. Voir l\'Aide, étape « Créer le jeton ».');
+      else etape('Contrôle automatique absent ou désactivé : publication sans l\'attendre (tes textes ont déjà été vérifiés ici).');
       await gh(`${R}/merges`, { method: 'POST', body: { base: PRINCIPALE, head: branche, commit_message: message } });
       etape('Publié.');
     } finally { try { await gh(`${R}/git/refs/heads/${branche}`, { method: 'DELETE' }); } catch { /* nettoyage facultatif */ } }
