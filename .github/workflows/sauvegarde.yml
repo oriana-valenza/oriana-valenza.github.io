@@ -1,0 +1,33 @@
+name: Sauvegarde mensuelle
+# Une copie complète du site (fichier zip) est publiée une fois par mois dans « Releases » du dépôt.
+# Déclenchée par une publication sur main (une seule sauvegarde par mois), par le calendrier, ou à la main (Actions, Run workflow).
+# Pour restaurer : télécharger le zip du mois voulu et en remettre le contenu dans le dépôt.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 3 1 * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sauvegarde:
+    name: sauvegarde
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git -c http.extraheader="Authorization: Basic $(printf "x-access-token:%s" "${GH_TOKEN}" | base64 -w0)" fetch -q --depth=1 origin "${GITHUB_SHA}"
+          git checkout -q FETCH_HEAD
+      - name: Créer la sauvegarde du mois si elle n'existe pas
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          nom="sauvegarde-$(date -u +%Y-%m)"
+          if gh release view "$nom" >/dev/null 2>&1; then echo "Sauvegarde $nom déjà faite."; exit 0; fi
+          git archive --format=zip -o "$nom.zip" HEAD
+          gh release create "$nom" "$nom.zip" --title "Sauvegarde $(date -u +%Y-%m)" --notes "Copie complète du site à cette date (zip). Restaurer : remettre le contenu du zip dans le dépôt."

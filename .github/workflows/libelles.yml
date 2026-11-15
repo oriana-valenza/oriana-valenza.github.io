@@ -1,0 +1,22 @@
+name: Libellés de l'éditeur
+# Garde-fou pour le développeur : échoue si un champ de donnees/fr.json n'a pas de libellé dans admin/libelles.js.
+# Séparé du contrôle anti-secrets : il ne bloque pas les publications d'Oriana (l'éditeur n'attend que « controle »).
+on:
+  push:
+permissions:
+  contents: read
+jobs:
+  libelles:
+    name: libelles
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git -c http.extraheader="Authorization: Basic $(printf "x-access-token:%s" "${GH_TOKEN}" | base64 -w0)" fetch -q --depth=1 origin "${GITHUB_SHA}"
+          git checkout -q FETCH_HEAD
+      - name: Vérifier les libellés
+        run: node .github/controle-libelles.js .

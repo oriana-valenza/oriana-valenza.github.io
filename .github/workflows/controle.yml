@@ -1,15 +1,24 @@
 name: Contrôle anti-secrets
 # Vérifie chaque publication : e-mails, téléphones, jetons, fichiers de travail, texte des PDF.
+# Aucune action tierce : le dépôt est récupéré avec git et le jeton fourni par GitHub (rien à mettre à jour avec les années).
+# DÉBRAYAGE : voir l'aide du site (supprimer ce fichier ou désactiver les Actions du dépôt).
 on:
   push:
-  pull_request:
 permissions:
   contents: read
 jobs:
   controle:
+    name: controle
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Récupérer le dépôt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git -c http.extraheader="Authorization: Basic $(printf "x-access-token:%s" "${GH_TOKEN}" | base64 -w0)" fetch -q --depth=1 origin "${GITHUB_SHA}"
+          git checkout -q FETCH_HEAD
       - name: Outil de lecture des PDF
         run: command -v pdftotext >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils)
       - name: Cas témoins du contrôle

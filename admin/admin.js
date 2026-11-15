@@ -17,69 +17,8 @@
   const MAX_TEXTE = 6000;
 
   /* ---------- Libellés en français ---------- */
-  const SECTIONS = [
-    { id: 'rvl', titre: 'Musique (RVL)', aide: "L'EP, ses titres, les paroles, le kolam", cles: ['rvl'] },
-    { id: 'ecriture', titre: 'Écriture', aide: 'Les livres', cles: ['ecriture'] },
-    { id: 'audiovisuel', titre: 'Audiovisuel', aide: 'Films, documentaires, clips', cles: ['audiovisuel'] },
-    { id: 'services', titre: 'Services', aide: 'Ateliers, coaching, accompagnement', cles: ['services'] },
-    { id: 'oriana', titre: 'Oriana (présentation)', aide: 'Présentation et parcours', cles: ['oriana'] },
-    { id: 'accueil', titre: 'Accueil et informations générales', aide: 'Nom, métier, ville, texte de la page d\'accueil', cles: ['site', 'accueil'] },
-    { id: 'mentions', titre: 'Mentions légales', aide: 'Texte légal du site', cles: ['mentions'] },
-    { id: 'ui', titre: 'Petits textes du site', aide: 'Bas de page, boutons, menu, messages', cles: ['ui', 'nav', 'page_404'] },
-    { id: 'liens', titre: 'Liens', aide: 'YouTube, Spotify, Amazon, réseaux', special: 'liens' },
-    { id: 'bio', titre: 'Biographie', aide: 'Le texte de présentation', special: 'bio' },
-  ];
-  // Règle de couleur : ROUGE = titre d'un bloc de la page (dans l'ordre du site) ; NOIR = les champs à l'intérieur.
-  const GOOGLE = { titre: 'Pour Google et le partage', cles: ['meta_titre', 'meta_description'] };
-  const BLOCS = {
-    rvl: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre', 'intro', 'credit_label', 'credit'] }, { titre: "Les titres de l'EP", cles: ['titres_h', 'titres'] },
-      { titre: 'Les clips', cles: ['clip_h', 'clip_txt', 'clip_bientot', 'clips'] }, { titre: 'En concert', cles: ['concert_h', 'concert_date', 'concert_lieu', 'concert_billets', 'concerts'] },
-      { titre: 'Un symbole, une prière (le kolam)', cles: ['kolam_h', 'kolam_txt', 'kolam_alt'] }, GOOGLE],
-    ecriture: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les livres', cles: ['oeuvres'] }, GOOGLE],
-    audiovisuel: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les parties et leurs films', cles: ['parties'] }, GOOGLE],
-    services: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les offres', cles: ['offres'] },
-      { titre: 'Me contacter', cles: ['contact_h', 'contact_txt', 'contact_form', 'plaquette', 'siret'] }, GOOGLE],
-    oriana: [{ titre: 'En-tête de la page', cles: ['kicker', 'titre', 'sous_titre', 'portrait_alt'] }, { titre: 'Parcours', cles: ['parcours_h', 'parcours'] }, GOOGLE],
-    mentions: [{ titre: 'En-tête de la page', cles: ['titre', 'sous_titre'] }, { titre: 'Les sections', cles: ['sections'] }, GOOGLE],
-    accueil: [{ titre: "Page d'accueil", cles: ['aria_dessin', 'aria_oriana'] }, GOOGLE],
-    site: [{ titre: 'Nom, métier et ville', cles: ['nom', 'metier', 'ville'] }],
-    nav: [{ titre: 'Noms des pages dans le menu', cles: null }],
-    page_404: [{ titre: 'Page introuvable (erreur 404)', cles: null }],
-    ui: [{ titre: 'Menu et navigation', cles: ['menu_ouvrir', 'menu_fermer', 'menu_nav', 'langue', 'passer', 'retour', 'aller_contenu'] },
-      { titre: 'Bas de page', cles: ['contact_h', 'contact_txt', 'contact_form', 'lettre_h', 'lettre_txt', 'pages_h', 'reseaux_h', 'mentions'] },
-      { titre: 'Boutons et liens', cles: ['ecouter_h', 'youtube', 'spotify', 'billets', 'amazon', 'instagram', 'facebook'] },
-      { titre: 'Lecteur de vidéo et contenus à venir', cles: ['lire_video', 'video_note', 'bientot', 'paroles_bientot', 'visuel_bientot'] },
-      { titre: "Messages d'erreur", cles: ['sans_js', 'erreur'] }],
-  };
-  const ETIQ = {
-    titre: 'Titre', sous_titre: 'Sous-titre', intro: 'Introduction', texte: 'Texte', resume: 'Résumé', etat: "État (ex : En cours d'écriture)",
-    detail: 'Détail', image: 'Photo', image_alt: 'Description de la photo (pour les personnes qui ne la voient pas)', lien: 'Lien', infos: 'Infos en plus',
-    h: 'Titre de la partie', films: 'Films de cette partie', parties: 'Parties', oeuvres: 'Livres', offres: 'Offres', titres: "Titres de l'EP", titres_h: 'Titre de la liste des titres',
-    sens: 'Sens du titre', paroles: 'Paroles', instrumental: 'Titre instrumental (sans paroles)', kicker: 'Ligne au-dessus du titre', date: 'Date',
-    parcours: 'Parcours', parcours_h: 'Titre « Parcours »', sections: 'Sections', p: 'Paragraphes', credit: 'Crédit', credit_label: 'Rôle du crédit',
-    meta_titre: 'Titre affiché sur Google', meta_description: 'Description affichée sur Google', paysage: 'Photo en format paysage', portrait_alt: 'Description du portrait',
-    nom: 'Nom', metier: 'Métier', ville: 'Ville', kolam_h: 'Titre « Un symbole, une prière »', kolam_txt: 'Texte du kolam', kolam_alt: 'Description du kolam',
-    siret: 'Numéro SIRET', plaquette: 'Plaquette', contact_h: 'Titre « Contact »', contact_txt: 'Texte du contact', contact_form: 'Texte du formulaire',
-    clip_h: 'Titre « Clips »', clip_txt: 'Texte des clips', clip_bientot: 'Texte « clips bientôt »', concert_h: 'Titre « En concert »',
-    concert_date: 'Libellé « Date »', concert_lieu: 'Libellé « Lieu »', concert_billets: 'Libellé « Billets »', lien_retour: 'Lien de retour',
-  };
-  const NOM_ELEMENT = { concerts: 'Concert', clips: 'Clip', oeuvres: 'Livre', films: 'Film', parties: 'Partie', offres: 'Offre', titres: 'Titre', parcours: 'Étape', sections: 'Section', infos: 'Ligne', p: 'Paragraphe', kolam_txt: 'Paragraphe' };
-  const SECTION_NOM = { rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana', accueil: 'Accueil', site: 'Informations générales', mentions: 'Mentions légales', ui: 'Textes du site (boutons, bas de page, messages)', nav: 'Noms des pages dans le menu', page_404: 'Page introuvable (erreur 404)' };
-  const LIENS_ETIQ = {
-    youtube: 'YouTube : bouton « YouTube » de « Écouter et suivre » (page Musique). Colle l\'adresse de ta chaîne, d\'une playlist ou d\'une vidéo. (Les clips avec lecteur se règlent dans Musique, « Clips ».)',
-    spotify: 'Spotify : bouton « Spotify » (page Musique). Adresse commençant par https://',
-    amazon: 'Amazon : bouton du livre « Différente comme tout le monde » (page Écriture)',
-    billets: 'Billetterie : lien « Billets » du concert (page Musique)',
-    instagram: 'Instagram : lien en bas de toutes les pages',
-    facebook: 'Facebook : lien en bas de toutes les pages',
-    dates_concert: 'Date du concert (page Musique)', lieu_concert: 'Lieu du concert (page Musique)',
-    youtube_batisseuse: 'YouTube : documentaire Bâtisseuse (page Audiovisuel). Colle l\'adresse de la vidéo.',
-  };
+  const { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC } = window.LIBELLES; // voir libelles.js
   const idYoutube = (s) => { const m = String(s || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }; // accepte une adresse complète
-  const PARTAGES = new Set(['image', 'lien', 'n', 'instrumental', 'paysage', 'date', 'langue', 'billets', 'youtube']);
-  const MODELES = { concerts: { date: null, lieu: null, billets: null }, clips: { titre: null, youtube: null } }; // listes qui peuvent être vides au départ : forme d'une nouvelle fiche
-  const CACHES = new Set(['_note', 'langue', 'n']);
-  const LONGS = new Set(['resume', 'texte', 'intro', 'paroles', 'p', 'kolam_txt', 'meta_description', 'sous_titre', 'detail', 'image_alt', 'sens']);
 
   /* ---------- Outils ---------- */
   const S = { jeton: null, expire: null, docs: {}, base: {}, sha: {}, imgs: new Set(), staged: new Map(), annuler: null, brouillonOk: false };
@@ -98,31 +37,6 @@
   const ecrire = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* stockage indisponible */ } };
   const dire = (txt, ms = 3500) => { const m = $('#messages'); m.replaceChildren(h('span', {}, txt)); clearTimeout(dire.t); dire.t = setTimeout(() => m.replaceChildren(), ms); };
   const slug = (s) => String(s || 'photo').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'photo';
-  // Libellés précis selon la partie du site : chaque champ dit où il apparaît (jamais de nom de code).
-  const ETIQ_SEC = {
-    ui: {
-      menu_ouvrir: "Menu : texte du bouton qui ouvre le menu (lu par les lecteurs d'écran)", menu_fermer: "Menu : texte du bouton qui ferme le menu (lecteurs d'écran)",
-      menu_nav: "Menu : nom du menu (lecteurs d'écran)", langue: "Choix de la langue : nom (lecteurs d'écran)", passer: "Bouton « Passer l'intro »",
-      bientot: "Mot affiché quand un contenu n'est pas encore là (« Bientôt »)", retour: "Bas de page : lien de retour vers l'accueil", aller_contenu: "Lien caché « Aller au contenu » (lecteurs d'écran)",
-      contact_h: 'Bas de page : titre de la colonne Contact', contact_txt: "Bas de page : texte du contact (par exemple ton adresse e-mail professionnelle)", contact_form: 'Bas de page : phrase sur le formulaire de contact',
-      lettre_h: "Bas de page : titre de la colonne Lettre d'information", lettre_txt: "Bas de page : texte de la lettre d'information", pages_h: 'Bas de page : titre de la liste des pages',
-      reseaux_h: 'Bas de page : titre des réseaux sociaux', mentions: 'Bas de page : lien « Mentions légales »',
-      sans_js: 'Message si le navigateur bloque JavaScript', erreur: 'Message si le contenu ne se charge pas', lire_video: 'Lecteur de vidéo : texte du bouton',
-      video_note: 'Lecteur de vidéo : phrase sous le lecteur (confidentialité YouTube)', ecouter_h: 'Page Musique : titre « Écouter et suivre »',
-      youtube: 'Nom du bouton YouTube', spotify: 'Nom du bouton Spotify', billets: 'Page Musique : nom du lien de billetterie', amazon: "Page Écriture : texte du bouton d'achat du livre",
-      instagram: 'Bas de page : nom du lien Instagram', facebook: 'Bas de page : nom du lien Facebook', visuel_bientot: "Texte « Visuel bientôt » (pas utilisé pour l'instant)", paroles_bientot: 'Page Musique : texte quand les paroles ne sont pas encore là',
-    },
-    nav: (c) => ({ accueil: 'Accueil', rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana' }[c] ? `Menu : nom de la page « ${{ accueil: 'Accueil', rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana' }[c]} »` : null),
-    accueil: { aria_dessin: "Description du dessin de l'ange (lecteurs d'écran)", aria_oriana: "Description du bouton « Oriana » de l'ange (lecteurs d'écran)" },
-    site: { nom: 'Ton nom (affiché sur le site)', metier: 'Ton métier', ville: 'Ta ville' },
-    page_404: { titre: 'Titre de la page introuvable', texte: 'Texte de la page introuvable', lien: 'Texte du lien de retour' },
-    mentions: { h: 'Titre de la section', p: 'Paragraphes de la section' },
-    rvl: {
-      concerts: 'Concerts à venir (un par date : « Bientôt » disparaît dès qu\'il y en a un)', date: 'Date et heure (ex : samedi 12 décembre 2026, 20h)', lieu: 'Lieu (salle, ville)', billets: 'Adresse de la billetterie (commence par https://), laisse vide si entrée libre',
-      clips: 'Clips (un lecteur YouTube par clip : « Clips : bientôt » disparaît dès qu\'il y en a un)', titre: 'Titre', youtube: 'Vidéo YouTube : colle l\'adresse de la vidéo',
-      titres_h: 'Titre de la liste des titres', clip_bientot: 'Texte dans le cadre vide du clip (avant la vidéo)', credit_label: 'Rôle du crédit (ex. Arrangeur-piano)', credit: 'Nom du crédit' },
-    services: { contact_txt: 'Texte du contact (par exemple ton adresse e-mail professionnelle)', contact_form: 'Phrase sur le formulaire de contact', plaquette: 'Phrase sur la plaquette de services' },
-  };
   const etiquette = (cle, sec) => {
     const t = ETIQ_SEC[sec], r = typeof t === 'function' ? t(cle) : t && t[cle];
     if (r) return r;
@@ -193,10 +107,14 @@
   }
   const ser = (k) => JSONS.includes(k) ? JSON.stringify(nettoyer(S.docs[k]), null, 2) + '\n' : String(S.docs[k] ?? '').replace(/\r\n/g, '\n').replace(/\s+$/, '') + (k.startsWith('bio') ? '\n' : '');
   const serBase = (k) => S.baseSer[k];
-  const changes = () => Object.keys(FICHIERS).filter((k) => ser(k) !== serBase(k));
+  // « Changé » = différence réelle de contenu : ajouter un champ resté vide ne compte pas (rien ne changerait sur le site).
+  const sansNull = (v) => (Array.isArray(v) ? v.map(sansNull) : estObjet(v) ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== null).map(([k, x]) => [k, sansNull(x)])) : v);
+  const eff = (k) => (JSONS.includes(k) ? JSON.stringify(sansNull(nettoyer(S.docs[k]))) : ser(k));
+  const effBase = (k) => (JSONS.includes(k) ? JSON.stringify(sansNull(JSON.parse(S.baseSer[k]))) : S.baseSer[k]);
+  const changes = () => Object.keys(FICHIERS).filter((k) => eff(k) !== effBase(k));
 
   async function charger() {
-    const depot = await gh(R);
+    const depot = await gh(R); S.tailleKo = depot.size || 0;
     if (depot.permissions && depot.permissions.push === false) throw new Erreur("Ce jeton peut lire le site mais pas le modifier. Il faut « Contents : Lecture et écriture » (voir l'Aide).", 'droit');
     S.docs = {}; S.baseSer = {}; S.sha = {};
     await Promise.all(Object.entries(FICHIERS).map(async ([k, p]) => {
@@ -301,8 +219,11 @@
         }
       })(S.docs[k], []);
     }
+    (S.docs.liens.reseaux || []).forEach((r, i) => {
+      if ((r.nom || r.url) && !((r.nom || '').trim() && /^https:\/\/\S+$/.test(r.url || ''))) erreurs.push(`Liens › Autres réseaux › Réseau ${i + 1} : il faut un nom ET une adresse qui commence par https://`);
+    });
     for (const [c, v] of Object.entries(S.docs.liens)) {
-      if (c.startsWith('_') || v == null || v === '') continue;
+      if (c.startsWith('_') || Array.isArray(v) || v == null || v === '') continue;
       if (c === 'youtube') { if (!/^[\w-]{11}$/.test(v) && !/^https:\/\/\S+$/.test(v)) erreurs.push("Liens › YouTube (page Musique) : colle l'adresse complète (https://…)."); }
       else if (c.startsWith('youtube')) { if (!/^[\w-]{11}$/.test(v)) erreurs.push(`Liens › ${LIENS_ETIQ[c] || c} : l'identifiant YouTube a 11 caractères (la fin de l'adresse après « v= »).`); }
       else if (!['dates_concert', 'lieu_concert'].includes(c) && !/^https:\/\/\S+$/.test(v)) erreurs.push(`Liens › ${LIENS_ETIQ[c] || c} : l'adresse doit commencer par https://`);
@@ -405,7 +326,9 @@
     const max = 1600, k = Math.min(1, max / Math.max(bmp.width, bmp.height));
     const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
     c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
-    const blob = await new Promise((ok, ko) => c.toBlob((b) => (b ? ok(b) : ko(new Error('image'))), 'image/webp', 0.85));
+    const encoder = (q) => new Promise((ok, ko) => c.toBlob((b) => (b ? ok(b) : ko(new Error('image'))), 'image/webp', q));
+    let blob = await encoder(0.85);
+    for (let q = 0.7; blob.size > 1.5e6 && q >= 0.4; q -= 0.15) blob = await encoder(q); // une photo ne dépasse pas 1,5 Mo : le dépôt reste léger pendant des années
     return { blob, url: URL.createObjectURL(blob) };
   }
 
@@ -446,18 +369,23 @@
     if (sec.special === 'liens') {
       const L = S.docs.liens;
       for (const k of Object.keys(L)) {
-        if (k.startsWith('_')) continue;
+        if (k.startsWith('_') || Array.isArray(L[k])) continue;
         const id = 'c' + (++idn);
         const champ = champTexte(L[k], false, (v) => { L[k] = v || null; }, id);
         if (k.startsWith('youtube_')) champ.addEventListener('change', () => { const y = idYoutube(champ.value); if (y) { champ.value = y; L[k] = y; modifie(); } }); // adresse complète acceptée
         main.append(h('label', { for: id }, LIENS_ETIQ[k] || etiquette(k)), champ);
       }
-      main.append(h('p', { class: 'doux' }, 'Laisse vide si tu n\'as pas encore le lien : le site affichera « Bientôt ». YouTube : seulement les 11 caractères après « v= ».'),
-        h('div', { class: 'outils' }, h('button', { onclick: async () => {
-          const champ = h('input', { type: 'text', placeholder: 'ex : TikTok' });
-          const nom = await dialogue('Nouveau lien', h('div', {}, h('label', {}, 'Nom du lien'), champ), [{ label: 'Annuler', valeur: null }, { label: 'Ajouter', valeur: true, primaire: true }]);
-          const cle = slug(champ.value).replace(/-/g, '_'); if (nom && cle && !(cle in L)) { L[cle] = null; LIENS_ETIQ[cle] = champ.value.trim(); modifie(); rendu(); }
-        } }, '+ Ajouter un lien')));
+      main.append(h('p', { class: 'doux' }, 'Laisse vide si tu n\'as pas encore le lien : le site affichera « Bientôt » ou ne montrera rien.'));
+      // Autres réseaux : chacun apparaît en bas de toutes les pages dès qu'il a un nom ET une adresse
+      if (!Array.isArray(L.reseaux)) L.reseaux = [];
+      main.append(h('h3', { class: 'bloc' }, 'Autres réseaux (affichés en bas de toutes les pages)'));
+      L.reseaux.forEach((r, i) => {
+        const id = 'r' + (++idn);
+        main.append(h('div', { class: 'carte' }, h('label', { for: id + 'n' }, 'Nom du réseau (ex : TikTok)'), champTexte(r.nom, false, (v) => { r.nom = v; }, id + 'n'),
+          h('label', { for: id + 'u' }, 'Adresse de ta page (https://…)'), champTexte(r.url, false, (v) => { r.url = v; }, id + 'u'),
+          h('div', { class: 'outils' }, h('button', { class: 'petit danger', onclick: async () => { if (await confirmer('Supprimer ce réseau ?', 'Il disparaîtra du bas des pages quand tu publieras.', 'Supprimer')) { L.reseaux.splice(i, 1); modifie(); rendu(); } } }, 'Supprimer'))));
+      });
+      main.append(h('div', { class: 'outils' }, h('button', { onclick: () => { L.reseaux.push({ nom: null, url: null }); modifie(); rendu(); } }, '+ Ajouter un réseau')));
     } else if (sec.special === 'bio') {
       main.append(h('p', { class: 'doux' }, 'Un paragraphe = un bloc, séparé du suivant par une ligne vide.'),
         h('div', { class: 'duo deux' },
@@ -489,8 +417,8 @@
   }
   function majBarre() { /* le décompte se met à jour au retour au menu */ }
   function compteSection(sec) {
-    if (sec.special === 'liens') return S.docs.liens && ser('liens') !== serBase('liens') ? 1 : 0;
-    if (sec.special === 'bio') return ['bio-fr', 'bio-en'].filter((k) => ser(k) !== serBase(k)).length;
+    if (sec.special === 'liens') return eff('liens') !== effBase('liens') ? 1 : 0;
+    if (sec.special === 'bio') return ['bio-fr', 'bio-en'].filter((k) => eff(k) !== effBase(k)).length;
     let n = 0; const a = JSON.parse(S.baseSer.fr), b = JSON.parse(S.baseSer.en);
     for (const c of sec.cles) {
       n +=diffCompte(a[c], nettoyer(S.docs.fr)[c]) + diffCompte(b[c], nettoyer(S.docs.en)[c]);
@@ -501,7 +429,10 @@
 
   function bandeauJeton() {
     const b = $('#bandeau'); b.replaceChildren();
-    if (!S.jeton || !S.expire) return;
+    if (!S.jeton) return;
+    if (S.tailleKo > 500000) b.append(h('div', { class: 'b rouge' }, `Le site pèse ${Math.round(S.tailleKo / 1024)} Mo : GitHub Pages est limité à 1 000 Mo. Évite d'ajouter de grosses photos ou des PDF lourds et préviens Simon.`));
+    else if (S.tailleKo > 300000) b.append(h('div', { class: 'b' }, `Le site pèse ${Math.round(S.tailleKo / 1024)} Mo (limite : 1 000 Mo). Pense à ne mettre que des photos utiles.`));
+    if (!S.expire) return;
     const jours = Math.ceil((new Date(S.expire + 'T23:59:59') - new Date()) / 86400000);
     if (jours < 0) b.append(h('div', { class: 'b rouge' }, `Ton jeton a expiré le ${S.expire}. Il faut le renouveler (voir l'Aide).`));
     else if (jours <= 30) b.append(h('div', { class: 'b' }, `Ton jeton expire dans ${jours} jour(s) (le ${S.expire}). Pense à le renouveler (voir l'Aide).`));
@@ -541,7 +472,8 @@
         h('button', { class: n ? 'primaire' : '', disabled: !n, onclick: () => montrer('publier') }, n ? 'Voir et publier mes modifications' : 'Aucune modification en attente'),
         S.annuler && h('button', { onclick: annulerDerniere }, 'Annuler ma dernière publication')),
       h('p', { class: 'doux' }, S.brouillonOk ? 'Tes modifications précédentes ont été retrouvées.' : ''),
-      h('div', { class: 'outils' }, h('button', { class: 'petit', onclick: () => { ecrire('ov_jeton', null); ecrire('ov_expire', null); S.jeton = null; ecranConnexion('Tu es déconnectée.'); } }, 'Me déconnecter')));
+      h('div', { class: 'outils' }, h('button', { class: 'petit', onclick: () => { ecrire('ov_jeton', null); ecrire('ov_expire', null); S.jeton = null; ecranConnexion('Colle ton NOUVEAU jeton. Tes modifications en attente sont gardées.'); } }, 'Renouveler mon jeton'),
+        h('button', { class: 'petit', onclick: () => { ecrire('ov_jeton', null); ecrire('ov_expire', null); S.jeton = null; ecranConnexion('Tu es déconnectée.'); } }, 'Me déconnecter')));
   }
 
   function ecranPublier() {
@@ -595,7 +527,7 @@
         while (Date.now() < limite && !verdict) {
           await new Promise((ok) => setTimeout(ok, LOCAL ? 300 : 4000));
           const c = await gh(`${R}/commits/${dernier}/check-runs`);
-          const l = c.check_runs || [];
+          const l = (c.check_runs || []).filter((x) => x.name === 'controle'); // seul le contrôle anti-secrets bloque la publication
           if (l.length && l.every((x) => x.status === 'completed')) verdict = l.every((x) => ['success', 'neutral', 'skipped'].includes(x.conclusion)) ? 'ok' : 'refus';
         }
         if (verdict === 'refus') throw new Erreur("Le contrôle de sécurité a refusé la publication (un numéro, un e-mail ou un fichier non voulu ?). Rien n'a été publié. Vérifie tes textes ou demande de l'aide.", 'controle');

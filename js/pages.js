@@ -118,11 +118,12 @@
   function piedDePage() {
     const T = OV.t.bind(OV);
     const reseaux = ['instagram', 'facebook'].filter((k) => lienSur(OV.L[k]));
+    const autres = (Array.isArray(OV.L.reseaux) ? OV.L.reseaux : []).filter((r) => r && typeof r.nom === 'string' && r.nom.trim() && lienSur(r.url)); // réseaux ajoutés dans l'éditeur
     return `<div class="cadre"><div class="colonnes">
       <div><a class="retour" data-int="" href="${OV.adresse('')}"><span class="tete-ange"><img src="${OV.base}img/ange.svg" alt="" loading="lazy" width="220" height="378"></span><span>${esc(T('ui.retour'))}</span></a></div>
       <div><h2>${esc(T('ui.contact_h'))}</h2><p>${esc(T('ui.contact_txt'))}</p><p>${esc(T('ui.contact_form'))}</p></div>
       <div><h2>${esc(T('ui.lettre_h'))}</h2><p>${esc(T('ui.lettre_txt'))}</p>
-        ${reseaux.length ? `<h2 style="margin-top:22px">${esc(T('ui.reseaux_h'))}</h2><ul>${reseaux.map((k) => `<li><a href="${esc(OV.L[k])}" target="_blank" rel="noopener noreferrer">${esc(T('ui.' + k))}</a></li>`).join('')}</ul>` : ''}</div>
+        ${reseaux.length || autres.length ? `<h2 style="margin-top:22px">${esc(T('ui.reseaux_h'))}</h2><ul>${reseaux.map((k) => `<li><a href="${esc(OV.L[k])}" target="_blank" rel="noopener noreferrer">${esc(T('ui.' + k))}</a></li>`).join('')}${autres.map((r) => `<li><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.nom.trim())}</a></li>`).join('')}</ul>` : ''}</div>
       <div><h2>${esc(T('ui.pages_h'))}</h2><ul>${PAGES.map((p) => `<li><a data-int="${p}/" href="${OV.adresse(p + '/')}"${p === PAGE ? ' aria-current="page"' : ''}>${esc(T('nav.' + p))}</a></li>`).join('')}</ul></div>
     </div><div class="bas-de-page"><span>© Oriana Valenza</span><a data-int="mentions-legales/" href="${OV.adresse('mentions-legales/')}">${esc(T('ui.mentions'))}</a></div></div>`;
   }
