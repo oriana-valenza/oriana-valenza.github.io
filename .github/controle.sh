@@ -100,11 +100,19 @@ controle() { # $1 = dossier
 
   # 6. Feuille de style du thème (écrite par l'éditeur d'apparence) : seulement des lignes --variable:valeur dans :root{ }
   if [ -f "$dir/css/theme.css" ]; then
-    out=$(sed -E 's#/\*.*\*/##g' "$dir/css/theme.css" | tr -d '\r' | grep -vE '^[[:space:]]*$' | grep -vE '^:root\{$|^\}$|^--[a-z0-9-]+:(#[0-9A-Fa-f]{6}|[0-9]{1,3},[0-9]{1,3},[0-9]{1,3});$|^--(titre|texte|titre-musique):"[A-Za-z0-9 ]{2,40}",[A-Za-z-]+(,[A-Za-z-]+){0,2};$|^--(musique-)?echelle:[0-9](\.[0-9]{1,2})?;$|^@font-face\{font-family:"[A-Za-z0-9 ]{2,40}";font-weight:[0-9]{3,4}( [0-9]{3,4})?;src:url\("\.\./polices/[a-z0-9-]+\.woff2"\) format\("woff2"\);font-display:swap\}$' | head -5)
+    out=$(sed -E 's#/\*.*\*/##g' "$dir/css/theme.css" | tr -d '\r' | grep -vE '^[[:space:]]*$' | grep -vE '^:root\{$|^\}$|^--[a-z0-9-]+:(#[0-9A-Fa-f]{6}|[0-9]{1,3},[0-9]{1,3},[0-9]{1,3});$|^--(titre|texte|titre-musique):"[A-Za-z0-9 ]{2,40}",[A-Za-z-]+(,[A-Za-z-]+){0,2};$|^--(musique-)?echelle:[0-9](\.[0-9]{1,2})?;$|^@font-face\{font-family:"[A-Za-z0-9 ]{2,40}";font-weight:[0-9]{3,4}( [0-9]{3,4})?;src:url\("\.\./polices/[a-z0-9-]+\.(woff2|woff|ttf|otf)"\) format\("(woff2|woff|truetype|opentype)"\);font-display:swap\}$' | head -5)
     if [ -n "$out" ]; then echo "== css/theme.css : contenu non autorisé (seuls sont permis : --variable:#RRGGBB;, polices du catalogue, échelles et @font-face locaux de polices/)"; echo "$out"; rc=1; fi
-    for p in $(grep -o 'polices/[a-z0-9-]*\.woff2' "$dir/css/theme.css"); do   # chaque fichier de police cité doit exister
+    for p in $(grep -oE 'polices/[a-z0-9-]+\.(woff2|woff|ttf|otf)' "$dir/css/theme.css"); do   # chaque fichier de police cité doit exister
       [ -f "$dir/$p" ] || { echo "== css/theme.css : fichier de police absent : $p"; rc=1; }
     done
+  fi
+  # 7. Polices déposées par l'éditeur (polices/depot-*) : 300 Ko au plus et vraie signature de police (wOF2, wOFF, OTTO, true, 00010000)
+  if [ -d "$dir/polices" ]; then
+    while IFS= read -r f; do
+      [ -z "$f" ] && continue
+      [ "$(wc -c < "$f")" -gt 307200 ] && { echo "== police déposée trop lourde (> 300 Ko) : ${f#$dir/}"; rc=1; }
+      case "$(head -c4 "$f" | od -An -tx1 | tr -d ' \n')" in 774f4632|774f4646|4f54544f|74727565|00010000) ;; *) echo "== police déposée : ce n'est pas une police : ${f#$dir/}"; rc=1 ;; esac
+    done < <(find "$dir/polices" -type f -name 'depot-*')
   fi
 
   [ $rc -eq 0 ] && echo "OK : rien de suspect détecté (relire le diff quand même)."
@@ -137,10 +145,15 @@ autotest() {
   printf '@font-face{font-family:"Lora";font-weight:400;src:url("../polices/../../x.woff2") format("woff2");font-display:swap}\n' > "$t/font_chemin/css/theme.css"
   printf '%s\n' "$ff" > "$t/font_absent/css/theme.css"
   printf '@font-face{font-family:"Lora";font-weight:400;src:url("../polices/lora-x.woff2") format("woff2");font-display:swap;unicode-range:U+0}\n' > "$t/font_regle/css/theme.css"; echo x > "$t/font_regle/polices/lora-x.woff2"
-  for c in propre ok_mail ok_tel theme_ok font_ok; do
+  mkdir -p "$t/depot_ok/css" "$t/depot_ok/polices" "$t/depot_gros/polices" "$t/depot_faux/polices"
+  printf '@font-face{font-family:"Ma Police";font-weight:400;src:url("../polices/depot-ma-police.ttf") format("truetype");font-display:swap}\n' > "$t/depot_ok/css/theme.css"
+  printf '\000\001\000\000abcdef' > "$t/depot_ok/polices/depot-ma-police.ttf"
+  { printf 'wOF2'; head -c 320000 /dev/zero; } > "$t/depot_gros/polices/depot-grosse.woff2"
+  echo "ceci est un texte, pas une police" > "$t/depot_faux/polices/depot-fausse.woff2"
+  for c in propre ok_mail ok_tel theme_ok font_ok depot_ok; do
     controle "$t/$c" >/dev/null; [ $? -eq 0 ] && echo "PASS négatif : $c accepté" || { echo "FAIL négatif : $c refusé à tort"; ok=1; }
   done
-  for c in mail tel1 tel2 tel3 jeton fichier autre_tel theme_url theme_import theme_bloc font_distant font_chemin font_absent font_regle; do
+  for c in mail tel1 tel2 tel3 jeton fichier autre_tel theme_url theme_import theme_bloc font_distant font_chemin font_absent font_regle depot_gros depot_faux; do
     controle "$t/$c" >/dev/null; [ $? -eq 1 ] && echo "PASS positif : $c bloqué" || { echo "FAIL positif : $c NON détecté"; ok=1; }
   done
   rm -rf "$t"; exit $ok

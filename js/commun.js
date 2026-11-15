@@ -9,6 +9,8 @@
     try { const s = localStorage.getItem('langue-oriana'); if (s === 'fr' || s === 'en') return s; } catch (_) {}
     return 'fr';
   };
+  // Aperçu de l'éditeur (/admin/) : seulement dans son cadre nommé, et jamais pour un visiteur ; applique le thème en cours d'édition.
+  if (window.name === 'apercu-oriana') try { const c = sessionStorage.getItem('apercu_theme'); if (c) { const st = document.createElement('style'); st.textContent = c; document.head.appendChild(st); } } catch (_) {}
   const OV = window.OV = {
     base, lang: lireLangue(), T: null, L: null, ecouteurs: [],
     t: (chemin) => get(OV.T, chemin),

@@ -67,3 +67,7 @@ details.carte > summary { cursor: pointer; font-weight: 600; padding: .7rem 0; m
 .sommaire a { padding: .4rem .2rem; display: inline-block; color: var(--accent); font-weight: 600; }
 #messages { position: fixed; left: 1rem; right: 1rem; bottom: 4.8rem; text-align: center; pointer-events: none; z-index: 30; }
 #messages span { background: var(--texte); color: var(--fond); padding: .5rem .9rem; border-radius: 2rem; display: inline-block; pointer-events: auto; }
+
+/* Aperçu du site dans l'éditeur d'apparence */
+.apercu-cadre { overflow: hidden; border: 1px solid var(--bord); border-radius: .6rem; background: #0A0A0A; margin: .6rem 0; }
+.apercu-cadre iframe { border: 0; transform-origin: 0 0; display: block; background: #0A0A0A; }

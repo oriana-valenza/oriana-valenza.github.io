@@ -18,7 +18,7 @@
   const MAX_TEXTE = 6000;
 
   /* ---------- Libellés en français ---------- */
-  const { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS, POLICES, ROLES, ECHELLES } = window.LIBELLES; // voir libelles.js
+  const { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS, POLICES, ROLES, ECHELLES, DEPOT: DEPOT_POLICE } = window.LIBELLES; // voir libelles.js
   const idYoutube = (s) => { const m = String(s || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }; // accepte une adresse complète
 
   /* ---------- Thème : couleurs, contraste, génération de css/theme.css ---------- */
@@ -32,8 +32,11 @@
   const DEF = Object.fromEntries(COULEURS.map((c) => [c.cle, c.def.toUpperCase()]));
   const couleursDe = (t) => { const c = (t && t.couleurs) || {}; return Object.fromEntries(COULEURS.map((x) => [x.cle, HEX.test(c[x.cle] || '') ? c[x.cle].toUpperCase() : DEF[x.cle]])); };
   const couleursTheme = () => couleursDe(S.docs.theme);
-  const policeDe = (cle) => POLICES.find((p) => p.cle === cle);
-  const policesDe = (t) => { const p = (t && t.polices) || {}; return Object.fromEntries(ROLES.map((r) => [r.cle, policeDe(p[r.cle]) ? p[r.cle] : r.def])); };
+  const deposees = (t = S.docs.theme) => (Array.isArray(t && t.polices_deposees) ? t.polices_deposees : []).filter((d) => d && /^[A-Za-z0-9 ]{2,40}$/.test(d.nom || '') && /^depot-[a-z0-9-]+\.(woff2|woff|ttf|otf)$/.test(d.fichier || ''));
+  const policeDepot = (d) => ({ cle: d.nom, nom: d.nom + ' (ma police)', gen: 'Georgia,serif', fichier: d.fichier.replace(/\.[a-z0-9]+$/, ''), ext: d.fichier.split('.').pop(), poids: '400', texte: true, h1: 0.55, depot: true });
+  const toutesPolices = (t = S.docs.theme) => [...POLICES, ...deposees(t).map(policeDepot)];
+  const policeDe = (cle, t = S.docs.theme) => toutesPolices(t).find((p) => p.cle === cle);
+  const policesDe = (t) => { const p = (t && t.polices) || {}; return Object.fromEntries(ROLES.map((r) => [r.cle, policeDe(p[r.cle], t) ? p[r.cle] : r.def])); };
   const taillesDe = (t) => (ECHELLES.some((e) => e.cle === (t && t.taille)) ? t.taille : 'normal');
   const policesTheme = () => policesDe(S.docs.theme), tailleTheme = () => taillesDe(S.docs.theme);
   const derivees = (c) => ({ // variantes calculées ; valeur d'origine conservée tant que la couleur de base n'est pas changée
@@ -42,22 +45,22 @@
     'or-clair': c.or === DEF.or ? '#D9BE84' : melange(c.or, '#FFFFFF', .3),
     'or-pale': c.or === DEF.or ? '#F4E6C2' : melange(c.or, '#FFFFFF', .75),
     'or-reflet': c.or === DEF.or ? '#E6D3A3' : melange(c.or, '#FFFFFF', .5) });
-  function cssTheme(c, pol = policesDe(null), taille = 'normal') { // seules les valeurs changées sont écrites ; rien d'autre que @font-face locaux et --variable:valeur
+  function cssTheme(c, pol = policesDe(null), taille = 'normal', tout = false) { // seules les valeurs changées sont écrites ; rien d'autre que @font-face locaux et --variable:valeur
     const d = derivees(c), lignes = [], faces = [];
-    for (const x of COULEURS) if (c[x.cle] !== DEF[x.cle]) {
+    for (const x of COULEURS) if (tout || c[x.cle] !== DEF[x.cle]) {
       lignes.push(`--${x.cle}:${c[x.cle]};`);
       if (['bg', 'or', 'rouge'].includes(x.cle)) lignes.push(`--${x.cle}-rgb:${rgb(c[x.cle]).join(',')};`);
       if (x.cle === 'ligne') lignes.push(`--ligne2:${d.ligne2};`);
       if (x.cle === 'rouge') lignes.push(`--accent-clair:${d['accent-clair']};`);
       if (x.cle === 'or') lignes.push(`--or-clair:${d['or-clair']};`, `--or-pale:${d['or-pale']};`, `--or-reflet:${d['or-reflet']};`);
     }
-    for (const r of ROLES) if (pol[r.cle] !== r.def) { // police changée : son @font-face (si elle n'est pas déjà dans base.css) puis la variable
+    for (const r of ROLES) if (tout || pol[r.cle] !== r.def) { // police changée : son @font-face (si elle n'est pas déjà dans base.css) puis la variable
       const p = policeDe(pol[r.cle]);
-      if (!p.base && !faces.some((f) => f.includes('"' + p.cle + '"'))) faces.push(`@font-face{font-family:"${p.cle}";font-weight:${p.poids};src:url("../polices/${p.fichier}.woff2") format("woff2");font-display:swap}`);
+      if (!p.base && !faces.some((f) => f.includes('"' + p.cle + '"'))) faces.push(`@font-face{font-family:"${p.cle}";font-weight:${p.poids};src:url("../polices/${p.fichier}.${p.ext || 'woff2'}") format("${DEPOT_POLICE.formats[p.ext || 'woff2']}");font-display:swap}`);
       lignes.push(`--${r.var}:"${p.cle}",${p.gen};`);
       if (r.cle === 'musique') lignes.push(`--musique-echelle:${p.h1};`);
     }
-    if (taille !== 'normal') lignes.push(`--echelle:${ECHELLES.find((e) => e.cle === taille).v};`);
+    if (tout || taille !== 'normal') lignes.push(`--echelle:${ECHELLES.find((e) => e.cle === taille).v};`);
     return ENTETE_CSS + faces.join('\n') + (faces.length ? '\n' : '') + (lignes.length ? ':root{\n' + lignes.join('\n') + '\n}\n' : '');
   }
   function problemesContraste(c) { // bloquant à la publication : le site doit rester lisible
@@ -225,6 +228,9 @@
         for (const x of COULEURS) if (a[x.cle] !== b[x.cle]) lignes.push({ txt: 'Apparence › ' + x.nom, type: 'modifié', avant: a[x.cle], apres: b[x.cle] });
         const pa = policesDe(JSON.parse(S.baseSer.theme)), pb = policesTheme();
         for (const r of ROLES) if (pa[r.cle] !== pb[r.cle]) lignes.push({ txt: 'Apparence › ' + r.nom, type: 'modifié', avant: pa[r.cle], apres: pb[r.cle] });
+        const da = deposees(JSON.parse(S.baseSer.theme)).map((d) => d.nom), db = deposees().map((d) => d.nom);
+        for (const n of db) if (!da.includes(n)) lignes.push({ txt: 'Apparence › Police ajoutée : ' + n, type: 'ajouté' });
+        for (const n of da) if (!db.includes(n)) lignes.push({ txt: 'Apparence › Police retirée : ' + n, type: 'supprimé' });
         const ta = taillesDe(JSON.parse(S.baseSer.theme)), tb = tailleTheme(), nomE = (c) => ECHELLES.find((e) => e.cle === c).nom;
         if (ta !== tb) lignes.push({ txt: 'Apparence › Taille du texte', type: 'modifié', avant: nomE(ta), apres: nomE(tb) });
         continue;
@@ -296,6 +302,12 @@
     const tp = (S.docs.theme && S.docs.theme.polices) || {};
     for (const r of ROLES) if (tp[r.cle] != null && !policeDe(tp[r.cle])) erreurs.push(`Apparence › ${r.nom} : cette police n'est pas dans le catalogue.`);
     for (const r of ROLES) if (r.texte && policeDe(policesTheme()[r.cle]) && !policeDe(policesTheme()[r.cle]).texte) erreurs.push(`Apparence › ${r.nom} : cette police n'a pas les épaisseurs nécessaires au texte courant ; choisis-en une autre.`);
+    const baseD = deposees(JSON.parse(S.baseSer.theme)).map((d) => d.fichier);
+    for (const d of deposees()) {
+      if (d.licence !== true) erreurs.push(`Apparence › Police « ${d.nom} » : il faut confirmer que tu as le droit de l'utiliser.`);
+      if (!S.staged.has('polices/' + d.fichier) && !baseD.includes(d.fichier)) erreurs.push(`Apparence › Police « ${d.nom} » : le fichier n'est plus disponible, ajoute-la à nouveau.`);
+    }
+    if (deposees().length > DEPOT_POLICE.max) erreurs.push('Apparence : trop de polices ajoutées (maximum ' + DEPOT_POLICE.max + ').');
     if (S.docs.theme && S.docs.theme.taille != null && !ECHELLES.some((e) => e.cle === S.docs.theme.taille)) erreurs.push('Apparence › Taille du texte : valeur inconnue.');
     if (!erreurs.some((e) => e.startsWith('Apparence'))) for (const m of problemesContraste(couleursTheme())) erreurs.push('Apparence : ' + m);
     // traductions manquantes (non bloquant)
@@ -506,6 +518,11 @@
     if (HEX.test(valeur) && valeur.toUpperCase() === DEF[cle]) delete c[cle]; else c[cle] = valeur;
     if (Object.keys(c).length) T.couleurs = c; else delete T.couleurs;
   }
+  const cssApercu = () => { // thème complet en cours d'édition, pour le cadre d'aperçu (jamais publié)
+    let c = cssTheme(couleursTheme(), policesTheme(), tailleTheme(), true).replace(/\.\.\/polices\//g, new URL('../polices/', location.href).pathname);
+    for (const [p, f] of S.staged) if (p.startsWith('polices/')) c = c.split('url("' + new URL('../' + p, location.href).pathname + '"').join('url("' + f.url + '"'); // police ajoutée mais pas encore publiée
+    return c;
+  };
   function fixerPolice(cle, valeur) { // ne garde dans theme.json que les polices différentes de l'origine
     const T = S.docs.theme = estObjet(S.docs.theme) ? S.docs.theme : {};
     const p = estObjet(T.polices) ? T.polices : {}, r = ROLES.find((x) => x.cle === cle);
@@ -518,13 +535,73 @@
     const p = policeDe(cle);
     if (!p || chargees.has(cle) || typeof FontFace === 'undefined') return;
     chargees.add(cle);
-    const f = new FontFace(p.cle, `url("../polices/${p.fichier}.woff2")`, { weight: p.poids });
-    f.load().then((x) => document.fonts.add(x)).catch(() => chargees.delete(cle));
+    const st = S.staged.get('polices/' + p.fichier + '.' + (p.ext || 'woff2'));
+    const src = st ? st.blob.arrayBuffer() : Promise.resolve(`url("../polices/${p.fichier}.${p.ext || 'woff2'}")`);
+    src.then((x) => new FontFace(p.cle, x, { weight: p.poids }).load()).then((x) => document.fonts.add(x)).catch(() => chargees.delete(cle));
+  }
+  const OCTETS_FONTE = { woff2: [0x77, 0x4f, 0x46, 0x32], woff: [0x77, 0x4f, 0x46, 0x46], otf: [0x4f, 0x54, 0x54, 0x4f] }; // ttf : 00 01 00 00 ou « true »
+  const fonteValide = (ext, o) => (ext === 'ttf' ? (o[0] === 0 && o[1] === 1 && o[2] === 0 && o[3] === 0) || [0x74, 0x72, 0x75, 0x65].every((v, i) => o[i] === v) : OCTETS_FONTE[ext].every((v, i) => o[i] === v));
+  function depotPolice() { // « Ajouter ma police » : fichier, nom, licence cochée ; rangée dans polices/depot-<nom>.<format>
+    const fic = h('input', { type: 'file', id: 'depot-fichier', accept: '.woff2,.woff,.ttf,.otf', 'aria-label': 'Fichier de police' });
+    const nom = h('input', { type: 'text', id: 'depot-nom', maxlength: '40', autocapitalize: 'off', spellcheck: 'false', 'aria-label': 'Nom de la police' });
+    const licence = h('input', { type: 'checkbox', id: 'depot-licence' }), msg = h('p', { id: 'depot-msg', role: 'status' });
+    const dire2 = (t, ok) => { msg.className = ok ? 'ok' : 'erreur'; msg.textContent = t; };
+    fic.addEventListener('change', () => { const f = fic.files[0]; if (f && !nom.value) nom.value = f.name.replace(/\.[^.]+$/, '').replace(/[^A-Za-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40); });
+    const ajouter = async () => {
+      const f = fic.files[0]; if (!f) return dire2('Choisis d\'abord le fichier de la police.');
+      const ext = (f.name.match(/\.([A-Za-z0-9]+)$/) || [])[1]; const e = ext && ext.toLowerCase();
+      if (!DEPOT_POLICE.formats[e]) return dire2('Ce type de fichier n\'est pas accepté : il faut .woff2, .woff, .ttf ou .otf.');
+      if (f.size > DEPOT_POLICE.octets) return dire2(`Ce fichier pèse ${Math.round(f.size / 1024)} Ko : le maximum est ${DEPOT_POLICE.octets / 1024} Ko. Cherche une version plus légère (.woff2 de préférence).`);
+      const o = new Uint8Array(await f.slice(0, 4).arrayBuffer());
+      if (!fonteValide(e, o)) return dire2('Ce fichier ne ressemble pas à une vraie police : il est refusé.');
+      const n = nom.value.replace(/\s+/g, ' ').trim();
+      if (!/^[A-Za-z0-9 ]{2,40}$/.test(n)) return dire2('Le nom de la police : 2 à 40 lettres, chiffres ou espaces (sans accent).');
+      if (toutesPolices().some((p) => p.cle.toLowerCase() === n.toLowerCase())) return dire2('Une police porte déjà ce nom : choisis un autre nom.');
+      if (deposees().length >= DEPOT_POLICE.max) return dire2(`Tu as déjà ${DEPOT_POLICE.max} polices ajoutées : retires-en une d'abord.`);
+      if (!licence.checked) return dire2('Coche la case : tu confirmes avoir le droit d\'utiliser cette police sur ton site.');
+      const slug = n.toLowerCase().replace(/ /g, '-'), fichier = `depot-${slug}.${e}`;
+      S.staged.set('polices/' + fichier, { blob: f, url: URL.createObjectURL(f) });
+      const T = S.docs.theme = estObjet(S.docs.theme) ? S.docs.theme : {};
+      T.polices_deposees = [...deposees(T), { nom: n, fichier, licence: true }];
+      modifie(); rendu();
+    };
+    const liste = deposees().map((d) => h('li', {}, d.nom + ' ', h('button', { class: 'petit', onclick: () => {
+      const T = S.docs.theme; T.polices_deposees = deposees(T).filter((x) => x.nom !== d.nom); if (!T.polices_deposees.length) delete T.polices_deposees;
+      for (const r of ROLES) if (T.polices && T.polices[r.cle] === d.nom) fixerPolice(r.cle, r.def); // un rôle qui l'utilisait revient à la police d'origine
+      S.staged.delete('polices/' + d.fichier); modifie(); rendu();
+    } }, 'Retirer')));
+    return h('details', { class: 'carte', id: 'depot-police' }, h('summary', {}, 'Ajouter une police à moi'),
+      h('p', { class: 'doux' }, `Pour une police qui n'est pas dans le catalogue. Format .woff2 de préférence (.woff, .ttf, .otf acceptés), ${DEPOT_POLICE.octets / 1024} Ko au maximum, ${DEPOT_POLICE.max} polices au plus. Elle sera copiée sur le site et se choisira ensuite dans les listes ci-dessus.`),
+      liste.length ? h('ul', { class: 'liste' }, liste) : null,
+      h('label', { for: 'depot-fichier' }, 'Fichier de la police'), fic,
+      h('label', { for: 'depot-nom' }, 'Nom à afficher (sans accent)'), nom,
+      h('label', { for: 'depot-licence' }, licence, " J'ai le droit d'utiliser cette police sur mon site (licence libre ou achetée)."),
+      h('div', { class: 'outils' }, h('button', { onclick: ajouter }, 'Ajouter cette police')), msg);
   }
   function rendreApparence(main) {
     main.append(h('p', {}, "Choisis les couleurs, les polices et la taille du texte du site. Les dessins (ange, symboles) gardent leur forme ; seules leurs couleurs suivent. Rien ne change sur le site tant que tu n'as pas publié."));
-    main.append(h('h2', {}, 'Couleurs'));
     const apercu = h('div', { class: 'carte', id: 'apercu-theme' }), etat = h('div', { id: 'etat-theme' }), champs = [];
+    let rafraichir = () => {};
+    const pages = [['Accueil', '../'], ['Musique', '../rvl/'], ['Écriture', '../ecriture/'], ['Audiovisuel', '../audiovisuel/'], ['Services', '../services/'], ['Oriana', '../oriana/']];
+    const choixPage = h('select', { id: 'apercu-page', 'aria-label': 'Page à voir' }, pages.map(([n, u]) => h('option', { value: u }, n)));
+    const choixMode = h('select', { id: 'apercu-mode', 'aria-label': "Taille de l'écran" }, h('option', { value: 'tel' }, 'Téléphone'), h('option', { value: 'ordi' }, 'Ordinateur'));
+    const cadre = h('div', { class: 'apercu-cadre' }), vue = h('iframe', { name: 'apercu-oriana', title: 'Aperçu du site', id: 'apercu-site' });
+    cadre.append(vue);
+    const dimension = () => {
+      const tel = choixMode.value === 'tel', w = tel ? 390 : 1280, hh = tel ? 780 : 800, k = Math.min(1, (cadre.clientWidth || 340) / w);
+      vue.style.setProperty('width', w + 'px'); vue.style.setProperty('height', hh + 'px'); vue.style.setProperty('transform', 'scale(' + k + ')'); cadre.style.setProperty('height', Math.round(hh * k) + 'px');
+    };
+    let minuterie; rafraichir = () => { // l'aperçu suit chaque réglage, sans rien publier
+      clearTimeout(minuterie);
+      minuterie = setTimeout(() => {
+        if (!vue.isConnected) return;
+        dimension();
+        try { sessionStorage.setItem('apercu_theme', cssApercu()); } catch (_) { /* aperçu sans effet si le stockage est refusé */ }
+        if (vue.getAttribute('src') !== choixPage.value) vue.setAttribute('src', choixPage.value); else if (vue.contentWindow) vue.contentWindow.location.reload();
+      }, 450);
+    };
+    choixPage.addEventListener('change', rafraichir); choixMode.addEventListener('change', rafraichir); addEventListener('resize', () => { if (vue.isConnected) dimension(); });
+    const widget = h('div', {}, h('h2', {}, 'Aperçu du site'), h('p', { class: 'doux' }, "Le vrai site avec tes réglages, avant de publier. Il se met à jour à chaque changement (ça peut prendre une seconde)."), h('div', { class: 'outils' }, choixPage, choixMode), cadre);
     const maj = () => {
       const c = couleursTheme(), p = problemesContraste(c);
       apercu.replaceChildren(h('strong', {}, 'Oriana Valenza'), h('p', {}, 'Texte principal : voici à quoi ressemblera ton site.'), h('p', {}, 'Texte discret : sous-titres et légendes.'),
@@ -537,8 +614,9 @@
       st(t, 'font-family', '"' + policesTheme().titres + '",serif'); st(tp, 'font-family', '"' + policesTheme().texte + '",sans-serif'); st(tm, 'font-family', '"' + policesTheme().texte + '",sans-serif');
       st(t, 'font-size', (1.3 * ECHELLES.find((e) => e.cle === tailleTheme()).v) + 'rem'); st(tp, 'font-size', ECHELLES.find((e) => e.cle === tailleTheme()).v + 'rem'); st(tm, 'font-size', ECHELLES.find((e) => e.cle === tailleTheme()).v + 'rem');
       for (const f of champs) f();
+      rafraichir();
     };
-    main.append(apercu, etat);
+    main.append(widget, etat, h('h2', {}, 'Couleurs'));
     for (const x of COULEURS) {
       const id = 'col-' + x.cle, sel = h('input', { type: 'color', id, 'aria-label': x.nom }), code = h('input', { type: 'text', id: id + '-code', maxlength: '7', autocapitalize: 'off', spellcheck: 'false', 'aria-label': x.nom + ' (code)' });
       const sync = () => { const v = couleursTheme()[x.cle]; sel.value = v.toLowerCase(); if (document.activeElement !== code) code.value = v; };
@@ -552,7 +630,7 @@
     main.append(h('h2', {}, 'Polices'));
     main.append(h('p', { class: 'doux' }, "Toutes les polices du catalogue sont libres de droits et hébergées sur le site (rien n'est chargé depuis un autre site)."));
     for (const r of ROLES) {
-      const id = 'pol-' + r.cle, sel = h('select', { id, 'aria-label': r.nom }, POLICES.filter((p) => !r.texte || p.texte).map((p) => h('option', { value: p.cle }, p.nom)));
+      const id = 'pol-' + r.cle, sel = h('select', { id, 'aria-label': r.nom }, toutesPolices().filter((p) => !r.texte || p.texte).map((p) => h('option', { value: p.cle }, p.nom)));
       const ex = h('p', { class: 'doux', id: id + '-ex' }, r.cle === 'musique' ? 'RVL' : r.cle === 'titres' ? 'Un beau titre : Oriana Valenza' : 'Voici un texte pour juger de la lisibilité et des chiffres (2026).');
       const sync = () => { const v = policesTheme()[r.cle]; sel.value = v; chargerPolice(v); ex.style.setProperty('font-family', '"' + v + '",serif'); ex.style.setProperty('font-size', r.cle === 'texte' ? '1rem' : '1.6rem'); ex.style.setProperty('color', couleursTheme().ink); };
       champs.push(sync); sync();
@@ -560,6 +638,7 @@
       main.append(h('label', { for: id }, r.nom), h('p', { class: 'doux' }, r.ou), h('div', { class: 'outils' }, sel,
         h('button', { class: 'petit', onclick: () => { fixerPolice(r.cle, r.def); modifie(); maj(); } }, "Police d'origine")), ex);
     }
+    main.append(depotPolice());
     main.append(h('h2', {}, 'Taille du texte'), h('p', { class: 'doux' }, 'Une seule taille pour tout le site (pour agrandir ou réduire tous les textes d\'un coup).'));
     const radios = ECHELLES.map((e) => { const r = h('input', { type: 'radio', name: 'taille', id: 'taille-' + e.cle, value: e.cle }); r.addEventListener('change', () => { fixerTaille(e.cle); modifie(); maj(); }); return r; });
     champs.push(() => { radios.forEach((r) => { r.checked = r.value === tailleTheme(); }); });
@@ -702,6 +781,7 @@
       const ch = changes();
       for (const k of ch) modifs.push({ cle: k, chemin: FICHIERS[k], contenu: ser(k) });
       if (ch.includes('theme')) modifs.push({ chemin: CSS_THEME, contenu: cssTheme(couleursTheme(), policesTheme(), tailleTheme()) }); // feuille de style générée : jamais saisie à la main
+      for (const d of deposees()) { const f = S.staged.get('polices/' + d.fichier); if (f) modifs.push({ chemin: 'polices/' + d.fichier, contenu: new Uint8Array(await f.blob.arrayBuffer()) }); } // polices déposées (seulement celles de la liste du thème)
       const utilisees = new Set(JSON.stringify([S.docs.fr, S.docs.en]).match(/[^"\\]+\.webp/g) || []);
       for (const [p, f] of S.staged) if (utilisees.has(p.slice(4))) modifs.push({ chemin: p, contenu: new Uint8Array(await f.blob.arrayBuffer()) });
       const tete = await pipeline(modifs, 'Mise à jour du site depuis l\'éditeur', progres);

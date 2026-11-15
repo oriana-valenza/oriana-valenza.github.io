@@ -45,6 +45,8 @@ window.LIBELLES = (() => {
     { cle: 'Open Sans', nom: 'Open Sans (sans empattement lisible)', gen: 'system-ui,sans-serif', fichier: 'open-sans-latin-wght-normal', poids: '300 800', texte: true, h1: 0.42 },
     { cle: 'Raleway', nom: 'Raleway (sans empattement élégant)', gen: 'system-ui,sans-serif', fichier: 'raleway-latin-wght-normal', poids: '200 900', texte: true, h1: 0.42 },
   ];
+  // Dépôt d'une police par Oriana : au plus 5, 300 Ko chacune, formats courants ; « fmt » = valeur CSS de format().
+  const DEPOT = { max: 5, octets: 300 * 1024, formats: { woff2: 'woff2', woff: 'woff', ttf: 'truetype', otf: 'opentype' } };
   // Les 3 rôles de police (donnees/theme.json, clé « polices ») ; « def » = police d'origine, « ou » = où elle apparaît.
   const ROLES = [
     { cle: 'titres', var: 'titre', def: 'Petit Formal Script', nom: 'Police des titres', ou: 'Les grands titres et les titres des blocs, des livres, des films et des clips.' },
@@ -130,5 +132,5 @@ window.LIBELLES = (() => {
       titres_h: 'Titre de la liste des titres', clip_bientot: 'Texte dans le cadre vide du clip (avant la vidéo)', credit_label: 'Rôle du crédit (ex. Arrangeur-piano)', credit: 'Nom du crédit' },
     services: { contact_txt: 'Texte du contact (par exemple ton adresse e-mail professionnelle)', contact_form: 'Phrase sur le formulaire de contact', plaquette: 'Phrase sur la plaquette de services' },
   };
-  return { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS, POLICES, ROLES, ECHELLES };
+  return { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS, POLICES, ROLES, ECHELLES, DEPOT };
 })();

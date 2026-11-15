@@ -33,6 +33,15 @@ node oriana-valenza/outils/test-editeur.js C:/Dev/oriana-valenza-site
 Page de test à la main : `node outils/faux-github.js <site> 8000 8001` puis `http://localhost:8000/admin/?api=http://localhost:8001` (jeton : `faux-jeton`). Le paramètre `?api=` n'est accepté que sur `localhost`.
 **Avant toute modification de `admin.js` ou `libelles.js` : lancer ce test, et `bash .github/controle.sh --autotest`.**
 
+## Apparence (couleurs, polices, taille du texte)
+- Source : `donnees/theme.json` (clés `couleurs`, `polices`, `polices_deposees`, `taille` ; seulement les valeurs changées). L'éditeur **génère** `css/theme.css` à la publication ; personne ne l'écrit à la main.
+- Tout est piloté par des variables CSS (`:root` de `css/base.css`) ; `theme.css` (chargé après `base.css`) ne contient que des `--variable:valeur` et des `@font-face` locaux. Les tailles de texte sont multipliées par `--echelle`.
+- Catalogue de polices, rôles, échelles et limites du dépôt : `libelles.js` (`POLICES`, `ROLES`, `ECHELLES`, `DEPOT`). Ajouter une police au catalogue : copier le .woff2 (+ licence `OFL_*.txt`) dans `polices/` et ajouter une ligne à `POLICES`.
+- Polices déposées par Oriana : `polices/depot-<nom>.<format>`, 300 Ko, 5 au plus, case de licence obligatoire.
+- **Contrôle (`.github/controle.sh`)** : refuse tout `theme.css` qui n'est pas dans la liste blanche (couleurs #RRGGBB, polices du catalogue, échelles, `@font-face` locaux), toute police absente, > 300 Ko ou qui n'a pas une vraie signature de police.
+- **Aperçu** : cadre `<iframe name="apercu-oriana">` ; l'éditeur écrit le thème complet dans `sessionStorage` et `js/commun.js` l'applique (seulement dans ce cadre nommé).
+- Contraste bloquant (WCAG) dans `problemesContraste`. Piège : la CSP de l'éditeur interdit `style=` (utiliser `element.style.setProperty`) ; `frame-src 'self'` et `font-src 'self'` sont nécessaires à l'aperçu.
+
 ## Pièges connus
 - L'ordre d'arrivée des fichiers au chargement varie : toute comparaison d'empreintes (`S.sha`) se fait dans l'ordre fixe de `FICHIERS` (bug réel corrigé : brouillons perdus au hasard).
 - Les validations d'adresse (`billets`, `youtube`) ne s'appliquent qu'aux fiches de listes ; ailleurs ce sont des libellés de texte (bug réel corrigé : publication bloquée).
