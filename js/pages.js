@@ -23,7 +23,7 @@
   }
   function cloneSvg(texte) {
     if (!texte) return null;
-    const doc = new DOMParser().parseFromString(texte, 'image/svg+xml');
+    const doc = new DOMParser().parseFromString(OV.recolorer(texte, (n) => 'var(--' + n + ')'), 'image/svg+xml');
     const svg = doc.documentElement;
     if (svg.localName !== 'svg') return null;
     svg.querySelectorAll('title,desc').forEach((n) => n.remove());
@@ -147,7 +147,7 @@
     sym.appendChild(svg); ov.appendChild(sym);
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'passer'; btn.textContent = OV.t('ui.passer');
     ov.appendChild(btn); document.body.appendChild(ov);
-    const anims = [], accent = 'rgb(' + getComputedStyle(document.body).getPropertyValue('--accent-rgb').trim() + ')';
+    const anims = [], ink = getComputedStyle(document.body).getPropertyValue('--ink').trim(), accent = 'rgb(' + getComputedStyle(document.body).getPropertyValue('--accent-rgb').trim() + ')';
     const A = (el, kf, opt) => anims.push(el.animate(kf, Object.assign({fill: 'both', easing: 'ease-in-out'}, opt)));
 
     const trace = [...svg.querySelectorAll('[pathLength]')];
@@ -183,8 +183,8 @@
       A(el, [{opacity: 0}, {opacity: cs.opacity}], {delay: d, duration: 1000});
     });
     if (PAGE === 'rvl') {                       // le kolam s'allume : du blanc à l'or
-      svg.querySelectorAll('#ligne').forEach((el) => A(el, [{stroke: '#F2EFEA'}, {stroke: accent}], {delay: 2500, duration: 1200}));
-      svg.querySelectorAll('#points').forEach((el) => A(el, [{fill: '#F2EFEA'}, {fill: accent}], {delay: 2500, duration: 1200}));
+      svg.querySelectorAll('#ligne').forEach((el) => A(el, [{stroke: ink}, {stroke: accent}], {delay: 2500, duration: 1200}));
+      svg.querySelectorAll('#points').forEach((el) => A(el, [{fill: ink}, {fill: accent}], {delay: 2500, duration: 1200}));
     }
     // Halo doux (progressif, sans à-coup)
     A(svg, [{filter: 'drop-shadow(0 0 0 rgba(' + getComputedStyle(document.body).getPropertyValue('--accent-rgb').trim() + ',0))'}, {filter: 'drop-shadow(0 0 12px rgba(' + getComputedStyle(document.body).getPropertyValue('--accent-rgb').trim() + ',.5))'}], {delay: 2600, duration: 1300});
@@ -234,7 +234,7 @@
     const P = OV.t(PAGE === 'mentions' ? 'mentions' : PAGE === '404' ? 'page_404' : PAGE);
     metas(P);
     contenu.innerHTML = await CONSTRUIT[PAGE](P);
-    pied.innerHTML = piedDePage();
+    pied.innerHTML = piedDePage(); OV.svgThemeUrl('img/ange.svg').then((u) => { const im = pied.querySelector('.tete-ange img'); if (u && im) im.src = u; });
     OV.appliquer();
     const texte = await chargerSymbole();
     const h = document.getElementById('sym-hero');

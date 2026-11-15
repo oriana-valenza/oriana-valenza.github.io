@@ -1,9 +1,9 @@
 /* Pages projet : même mise en page partout ; seuls le symbole et la couleur d'accent changent. */
-body[data-page="rvl"]{--accent:var(--or);--accent-rgb:184,151,90}
-body[data-page="ecriture"],body[data-page="audiovisuel"]{--accent:var(--rouge);--accent-rgb:168,41,46}
-body[data-page="services"],body[data-page="oriana"],body[data-page="mentions"],body[data-page="404"]{--accent:var(--or);--accent-rgb:184,151,90}
+body[data-page="rvl"]{--accent:var(--or);--accent-rgb:var(--or-rgb)}
+body[data-page="ecriture"],body[data-page="audiovisuel"]{--accent:var(--rouge);--accent-rgb:var(--rouge-rgb)}
+body[data-page="services"],body[data-page="oriana"],body[data-page="mentions"],body[data-page="404"]{--accent:var(--or);--accent-rgb:var(--or-rgb)}
 body[data-page]{min-height:100%;font-size:17px;line-height:1.7;font-weight:400}
-.entete{background:linear-gradient(#0A0A0A 55%,rgba(10,10,10,0))}
+.entete{background:linear-gradient(var(--bg) 55%,rgba(var(--bg-rgb),0))}
 #contenu{outline:none}
 .cadre{width:100%;max-width:1180px;margin:0 auto;padding:0 clamp(20px,5vw,56px)}
 h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0}
@@ -15,7 +15,7 @@ ul,ol{padding:0;list-style:none}
 .intro .sym{width:min(72vw,340px)}
 .intro .sym.large{width:min(84vw,460px)}
 .intro .sym svg{display:block;width:100%;height:auto;max-height:62svh}
-.intro .passer{position:absolute;bottom:max(28px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font:inherit;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);background:none;border:1px solid #3A3A3A;border-radius:999px;padding:12px 22px;cursor:pointer;transition:color .4s,border-color .4s}
+.intro .passer{position:absolute;bottom:max(28px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font:inherit;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);background:none;border:1px solid var(--ligne2);border-radius:999px;padding:12px 22px;cursor:pointer;transition:color .4s,border-color .4s}
 .intro .passer:hover,.intro .passer:focus-visible{color:var(--ink);border-color:var(--or)}
 .intro-attente #contenu,.intro-attente #pied{opacity:0}
 #contenu,#pied{transition:opacity .9s ease}
@@ -46,7 +46,7 @@ h1{font-family:var(--titre);font-weight:400;font-size:clamp(52px,13vw,116px);lin
 .liens-ecoute{display:flex;flex-wrap:wrap;gap:12px}
 .lien-bouton{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:10px 20px;border:1px solid var(--accent);border-radius:999px;color:var(--ink);text-decoration:none;font-size:15px;transition:background-color .4s,border-color .4s}
 .lien-bouton:hover,.lien-bouton:focus-visible{background:rgba(var(--accent-rgb),.18);border-color:var(--ink)}
-.lien-bouton.vide{border-color:#3A3A3A;color:var(--muted)}
+.lien-bouton.vide{border-color:var(--ligne2);color:var(--muted)}
 .lien-bouton .bientot{border:0;padding:0;font-size:11px}
 
 /* Liste des titres */
@@ -78,7 +78,7 @@ dl.infos dt{color:var(--muted)}
 .film-vedette{display:grid;gap:22px}
 .film-vedette h3{font-family:var(--titre);font-weight:400;font-size:clamp(44px,9vw,84px);line-height:1}
 .film-vedette .etat{color:var(--accent);letter-spacing:.14em;text-transform:uppercase;font-size:13px}
-body[data-page="audiovisuel"] .film-vedette .etat{color:#D6666A}
+body[data-page="audiovisuel"] .film-vedette .etat{color:var(--accent-clair)}
 
 /* Parcours et bio */
 .parcours li{display:grid;grid-template-columns:6.4em minmax(0,1fr);gap:6px 16px;padding:16px 0;border-top:1px solid var(--ligne)}
@@ -166,16 +166,16 @@ body[data-page="audiovisuel"] h1{font-size:clamp(34px,10.5vw,74px);white-space:n
   body[data-page="audiovisuel"] .hero .sym svg{animation:battement 1.6s ease-in-out infinite;transform-origin:50% 50%}
 }
 @keyframes battement{
-  0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(184,151,90,.22))}
-  25%{transform:scale(1.025);filter:drop-shadow(0 0 20px rgba(184,151,90,.5))}
-  55%{transform:scale(1.008);filter:drop-shadow(0 0 12px rgba(184,151,90,.32))}
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(var(--or-rgb),.22))}
+  25%{transform:scale(1.025);filter:drop-shadow(0 0 20px rgba(var(--or-rgb),.5))}
+  55%{transform:scale(1.008);filter:drop-shadow(0 0 12px rgba(var(--or-rgb),.32))}
 }
 
 /* Titre RVL : Italianno (choix de Simon) */
 body[data-page="rvl"] h1{font-family:"Italianno",var(--titre);font-size:clamp(110px,30.6vw,170px);letter-spacing:.03em;line-height:1.05}
 
 /* Audiovisuel : en-têtes de parties = style d'origine de « Court métrage » (.etat) */
-.bloc h2.partie{font-family:var(--texte);font-weight:400;font-size:clamp(22px,4.6vw,40px);line-height:1.25;letter-spacing:.14em;text-transform:uppercase;color:#D6666A}
+.bloc h2.partie{font-family:var(--texte);font-weight:400;font-size:clamp(22px,4.6vw,40px);line-height:1.25;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-clair)}
 .bloc h2.partie::after{display:none}
 .bloc h2.partie+*{margin-top:34px}
 /* Même proportion pour toutes les images (celle de V(i)ol, 772 x 938) */

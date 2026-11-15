@@ -24,6 +24,7 @@
 <meta property="og:locale:alternate" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/accueil.css">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "@id": "https://oriana-valenza.github.io/#oriana", "name": "Oriana Valenza", "url": "https://oriana-valenza.github.io/", "jobTitle": "Artiste auteure-interprète", "birthPlace": {"@type": "Place", "name": "Montpellier"}, "image": "https://oriana-valenza.github.io/img/oriana.webp", "description": "Site d'Oriana Valenza, artiste auteure-interprète née à Montpellier : musique (EP RVL), écriture, audiovisuel et services."}</script>
 </head>
@@ -49,13 +50,13 @@
     <title id="dessin-t">Figure ailée au trait blanc, auréole dorée, ailes ouvertes</title>
     <defs>
       <path id="arc-nom" d="M -220 185 A 470 470 0 0 1 220 185" fill="none"/>
-      <linearGradient id="fondu-bas" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0A0A0A" stop-opacity="0"/><stop offset="1" stop-color="#0A0A0A"/></linearGradient>
+      <linearGradient id="fondu-bas" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--bg)" stop-opacity="0"/><stop offset="1" stop-color="var(--bg)"/></linearGradient>
     </defs>
-    <image href="img/ange.svg?v=20261108" x="-640" y="90" width="1280" height="2200"/>
+    <image id="ange" href="img/ange.svg?v=20261108" x="-640" y="90" width="1280" height="2200"/>
     <rect id="fondu" x="-1100" y="1030" width="2200" height="221" fill="url(#fondu-bas)"/>
-    <rect id="coupe" x="-1100" y="1345" width="2200" height="1000" fill="#0A0A0A"/>
+    <rect id="coupe" x="-1100" y="1345" width="2200" height="1000" fill="var(--bg)"/>
     <a id="lien-oriana" href="oriana/" aria-label="Oriana">
-      <ellipse class="cible" cx="0" cy="190" rx="118" ry="44" fill="#0A0A0A" fill-opacity="0" stroke="none"/>
+      <ellipse class="cible" cx="0" cy="190" rx="118" ry="44" fill="var(--bg)" fill-opacity="0" stroke="none"/>
       <text class="nom-arc" font-size="34"><textPath href="#arc-nom" startOffset="50%" text-anchor="middle" textLength="300" lengthAdjust="spacing">ORIANA</textPath></text>
     </a>
   </svg>

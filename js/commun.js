@@ -15,6 +15,27 @@
     quandLangue: (f) => OV.ecouteurs.push(f),
     adresse: (cible) => base + cible + (OV.lang === 'en' ? '?lang=en' : ''),
   };
+  // Les SVG (img/ange.svg, img/symboles/) gardent leurs couleurs d'origine dans le fichier (rendu strictement identique) ; cette table dit
+  // à quelle variable du thème chacune correspond. Intégrés à la page (pages.js) : couleur remplacée par var(--x). En <img> / <image> :
+  // les pages mettent le fichier tel quel, puis svgThemeUrl() renvoie une copie recolorée seulement si le thème a changé (sinon null).
+  const COULEURS_SVG = {'#0a0a0a': 'bg', '#f2efea': 'ink', '#b8975a': 'or', '#a8292e': 'rouge', '#d9be84': 'or-clair', '#f4e6c2': 'or-pale', '#e6d3a3': 'or-reflet'};
+  OV.recolorer = (t, valeur) => t.replace(/#[0-9a-fA-F]{6}/g, (c) => { const n = COULEURS_SVG[c.toLowerCase()]; return n ? valeur(n, c) : c; });
+  const cacheSvg = {};
+  const chargee = new Promise((ok) => { if (document.readyState === 'complete') ok(); else addEventListener('load', () => ok()); });   // on ne touche pas au rendu avant la fin du chargement
+  OV.svgThemeUrl = (url) => chargee.then(() => {
+    const cs = getComputedStyle(document.documentElement);
+    if (Object.entries(COULEURS_SVG).every(([c, n]) => cs.getPropertyValue('--' + n).trim().toLowerCase() === c)) return null;   // thème d'origine : rien à changer
+    if (!cacheSvg[url]) cacheSvg[url] = fetch(base + url).then((r) => r.text()).catch(() => '');
+    return cacheSvg[url].then((t) => {
+      if (!t) return null;
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(OV.recolorer(t, (n, c) => cs.getPropertyValue('--' + n).trim() || c));
+    });
+  });
+  // Couleur de la barre du navigateur : suit le fond du thème
+  addEventListener('load', () => {
+    const fond = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(), mt = document.querySelector('meta[name="theme-color"]');
+    if (fond && mt) mt.content = fond;
+  });
   const charger = (lang) => Promise.all([
     fetch(base + 'donnees/' + lang + '.json').then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }),
     fetch(base + 'donnees/liens.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})),

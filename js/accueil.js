@@ -19,11 +19,12 @@
   const ORDRE = ['rvl', 'audio', 'ecriture', 'services'], ESPACE = 26, ESPACE_MIN = 12;
   const scene = document.getElementById('scene'), dessin = document.getElementById('dessin');
   const liens = {};
+  OV.svgThemeUrl('img/ange.svg?v=20261108').then((u) => { if (u) document.getElementById('ange').setAttribute('href', u); });
   ORDRE.forEach((id, i) => {
     const s = SYMBOLES[id], a = document.createElement('a');
     a.className = 'symbole'; a.dataset.int = s.page; a.href = s.page; a.style.animationDelay = (1.1 + i * .18) + 's';
     const icone = document.createElement('span'); icone.className = 'icone';
-    const im = new Image(); im.alt = ''; im.src = s.src; if (s.echelle) im.style.transform = 'scale(' + s.echelle + ')';
+    const im = new Image(); im.alt = ''; im.src = s.src; if (s.echelle) im.style.transform = 'scale(' + s.echelle + ')'; OV.svgThemeUrl(s.src).then((u) => { if (u) im.src = u; });
     icone.appendChild(im);
     const lib = document.createElement('span'); lib.className = 'libelle'; lib.dataset.i18n = 'nav.' + s.cle; lib.textContent = s.cle === 'audiovisuel' ? 'Audiovisuel' : s.cle === 'ecriture' ? 'Écriture' : s.cle === 'rvl' ? 'RVL' : 'Services';
     a.addEventListener('animationend', () => a.classList.add('vu'));   // apparu : le fondu ne se rejoue pas si on le déplace
