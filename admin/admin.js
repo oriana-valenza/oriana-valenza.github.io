@@ -18,7 +18,7 @@
   const MAX_TEXTE = 6000;
 
   /* ---------- Libellés en français ---------- */
-  const { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS } = window.LIBELLES; // voir libelles.js
+  const { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS, POLICES, ROLES, ECHELLES } = window.LIBELLES; // voir libelles.js
   const idYoutube = (s) => { const m = String(s || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }; // accepte une adresse complète
 
   /* ---------- Thème : couleurs, contraste, génération de css/theme.css ---------- */
@@ -32,14 +32,18 @@
   const DEF = Object.fromEntries(COULEURS.map((c) => [c.cle, c.def.toUpperCase()]));
   const couleursDe = (t) => { const c = (t && t.couleurs) || {}; return Object.fromEntries(COULEURS.map((x) => [x.cle, HEX.test(c[x.cle] || '') ? c[x.cle].toUpperCase() : DEF[x.cle]])); };
   const couleursTheme = () => couleursDe(S.docs.theme);
+  const policeDe = (cle) => POLICES.find((p) => p.cle === cle);
+  const policesDe = (t) => { const p = (t && t.polices) || {}; return Object.fromEntries(ROLES.map((r) => [r.cle, policeDe(p[r.cle]) ? p[r.cle] : r.def])); };
+  const taillesDe = (t) => (ECHELLES.some((e) => e.cle === (t && t.taille)) ? t.taille : 'normal');
+  const policesTheme = () => policesDe(S.docs.theme), tailleTheme = () => taillesDe(S.docs.theme);
   const derivees = (c) => ({ // variantes calculées ; valeur d'origine conservée tant que la couleur de base n'est pas changée
     ligne2: c.ligne === DEF.ligne ? '#3A3A3A' : melange(c.ligne, c.ink, .08),
     'accent-clair': c.rouge === DEF.rouge ? '#D6666A' : melange(c.rouge, '#FFFFFF', .3),
     'or-clair': c.or === DEF.or ? '#D9BE84' : melange(c.or, '#FFFFFF', .3),
     'or-pale': c.or === DEF.or ? '#F4E6C2' : melange(c.or, '#FFFFFF', .75),
     'or-reflet': c.or === DEF.or ? '#E6D3A3' : melange(c.or, '#FFFFFF', .5) });
-  function cssTheme(c) { // seules les valeurs changées sont écrites ; rien d'autre que --variable:valeur
-    const d = derivees(c), lignes = [];
+  function cssTheme(c, pol = policesDe(null), taille = 'normal') { // seules les valeurs changées sont écrites ; rien d'autre que @font-face locaux et --variable:valeur
+    const d = derivees(c), lignes = [], faces = [];
     for (const x of COULEURS) if (c[x.cle] !== DEF[x.cle]) {
       lignes.push(`--${x.cle}:${c[x.cle]};`);
       if (['bg', 'or', 'rouge'].includes(x.cle)) lignes.push(`--${x.cle}-rgb:${rgb(c[x.cle]).join(',')};`);
@@ -47,7 +51,14 @@
       if (x.cle === 'rouge') lignes.push(`--accent-clair:${d['accent-clair']};`);
       if (x.cle === 'or') lignes.push(`--or-clair:${d['or-clair']};`, `--or-pale:${d['or-pale']};`, `--or-reflet:${d['or-reflet']};`);
     }
-    return ENTETE_CSS + (lignes.length ? ':root{\n' + lignes.join('\n') + '\n}\n' : '');
+    for (const r of ROLES) if (pol[r.cle] !== r.def) { // police changée : son @font-face (si elle n'est pas déjà dans base.css) puis la variable
+      const p = policeDe(pol[r.cle]);
+      if (!p.base && !faces.some((f) => f.includes('"' + p.cle + '"'))) faces.push(`@font-face{font-family:"${p.cle}";font-weight:${p.poids};src:url("../polices/${p.fichier}.woff2") format("woff2");font-display:swap}`);
+      lignes.push(`--${r.var}:"${p.cle}",${p.gen};`);
+      if (r.cle === 'musique') lignes.push(`--musique-echelle:${p.h1};`);
+    }
+    if (taille !== 'normal') lignes.push(`--echelle:${ECHELLES.find((e) => e.cle === taille).v};`);
+    return ENTETE_CSS + faces.join('\n') + (faces.length ? '\n' : '') + (lignes.length ? ':root{\n' + lignes.join('\n') + '\n}\n' : '');
   }
   function problemesContraste(c) { // bloquant à la publication : le site doit rester lisible
     const d = derivees(c), p = [];
@@ -212,6 +223,10 @@
       if (k === 'theme') { // une ligne par couleur changée, avec son nom
         const a = couleursDe(JSON.parse(S.baseSer.theme)), b = couleursTheme();
         for (const x of COULEURS) if (a[x.cle] !== b[x.cle]) lignes.push({ txt: 'Apparence › ' + x.nom, type: 'modifié', avant: a[x.cle], apres: b[x.cle] });
+        const pa = policesDe(JSON.parse(S.baseSer.theme)), pb = policesTheme();
+        for (const r of ROLES) if (pa[r.cle] !== pb[r.cle]) lignes.push({ txt: 'Apparence › ' + r.nom, type: 'modifié', avant: pa[r.cle], apres: pb[r.cle] });
+        const ta = taillesDe(JSON.parse(S.baseSer.theme)), tb = tailleTheme(), nomE = (c) => ECHELLES.find((e) => e.cle === c).nom;
+        if (ta !== tb) lignes.push({ txt: 'Apparence › Taille du texte', type: 'modifié', avant: nomE(ta), apres: nomE(tb) });
         continue;
       }
       if (!JSONS.includes(k)) { lignes.push({ txt: k === 'contacts' ? 'Liste des contacts voulus sur le site' : 'Biographie' + (k === 'bio-en' ? ' (anglais)' : ''), type: 'modifié' }); continue; }
@@ -278,6 +293,10 @@
     }
     const th = (S.docs.theme && S.docs.theme.couleurs) || {};
     for (const x of COULEURS) if (th[x.cle] != null && !HEX.test(th[x.cle])) erreurs.push(`Apparence › ${x.nom} : code de couleur invalide (il faut # puis 6 chiffres ou lettres A à F, par exemple #B8975A).`);
+    const tp = (S.docs.theme && S.docs.theme.polices) || {};
+    for (const r of ROLES) if (tp[r.cle] != null && !policeDe(tp[r.cle])) erreurs.push(`Apparence › ${r.nom} : cette police n'est pas dans le catalogue.`);
+    for (const r of ROLES) if (r.texte && policeDe(policesTheme()[r.cle]) && !policeDe(policesTheme()[r.cle]).texte) erreurs.push(`Apparence › ${r.nom} : cette police n'a pas les épaisseurs nécessaires au texte courant ; choisis-en une autre.`);
+    if (S.docs.theme && S.docs.theme.taille != null && !ECHELLES.some((e) => e.cle === S.docs.theme.taille)) erreurs.push('Apparence › Taille du texte : valeur inconnue.');
     if (!erreurs.some((e) => e.startsWith('Apparence'))) for (const m of problemesContraste(couleursTheme())) erreurs.push('Apparence : ' + m);
     // traductions manquantes (non bloquant)
     let manque = 0;
@@ -487,8 +506,24 @@
     if (HEX.test(valeur) && valeur.toUpperCase() === DEF[cle]) delete c[cle]; else c[cle] = valeur;
     if (Object.keys(c).length) T.couleurs = c; else delete T.couleurs;
   }
+  function fixerPolice(cle, valeur) { // ne garde dans theme.json que les polices différentes de l'origine
+    const T = S.docs.theme = estObjet(S.docs.theme) ? S.docs.theme : {};
+    const p = estObjet(T.polices) ? T.polices : {}, r = ROLES.find((x) => x.cle === cle);
+    if (valeur === r.def) delete p[cle]; else p[cle] = valeur;
+    if (Object.keys(p).length) T.polices = p; else delete T.polices;
+  }
+  function fixerTaille(cle) { const T = S.docs.theme = estObjet(S.docs.theme) ? S.docs.theme : {}; if (cle === 'normal') delete T.taille; else T.taille = cle; }
+  const chargees = new Set();
+  function chargerPolice(cle) { // aperçu dans l'éditeur : charge le fichier du catalogue (police locale, jamais distante)
+    const p = policeDe(cle);
+    if (!p || chargees.has(cle) || typeof FontFace === 'undefined') return;
+    chargees.add(cle);
+    const f = new FontFace(p.cle, `url("../polices/${p.fichier}.woff2")`, { weight: p.poids });
+    f.load().then((x) => document.fonts.add(x)).catch(() => chargees.delete(cle));
+  }
   function rendreApparence(main) {
-    main.append(h('p', {}, "Choisis les couleurs du site. Les dessins (ange, symboles) gardent leur forme ; seules leurs couleurs suivent. Rien ne change sur le site tant que tu n'as pas publié."));
+    main.append(h('p', {}, "Choisis les couleurs, les polices et la taille du texte du site. Les dessins (ange, symboles) gardent leur forme ; seules leurs couleurs suivent. Rien ne change sur le site tant que tu n'as pas publié."));
+    main.append(h('h2', {}, 'Couleurs'));
     const apercu = h('div', { class: 'carte', id: 'apercu-theme' }), etat = h('div', { id: 'etat-theme' }), champs = [];
     const maj = () => {
       const c = couleursTheme(), p = problemesContraste(c);
@@ -499,6 +534,8 @@
       st(carte, 'background', c.surface); st(carte, 'color', c.ink); st(carte, 'border', '1px solid ' + c.ligne); st(carte, 'padding', '.6rem'); st(carte, 'border-radius', '.5rem'); st(carte, 'margin', '.5rem 0');
       st(o, 'color', c.or); st(o, 'font-weight', '700'); st(r, 'color', c.rouge); st(r, 'font-weight', '700');
       etat.replaceChildren(p.length ? h('div', {}, h('p', { class: 'erreur' }, 'À corriger avant de publier :'), h('ul', { class: 'liste' }, p.map((x) => h('li', { class: 'erreur' }, x)))) : h('p', { class: 'ok' }, 'Lisibilité : bonne.'));
+      st(t, 'font-family', '"' + policesTheme().titres + '",serif'); st(tp, 'font-family', '"' + policesTheme().texte + '",sans-serif'); st(tm, 'font-family', '"' + policesTheme().texte + '",sans-serif');
+      st(t, 'font-size', (1.3 * ECHELLES.find((e) => e.cle === tailleTheme()).v) + 'rem'); st(tp, 'font-size', ECHELLES.find((e) => e.cle === tailleTheme()).v + 'rem'); st(tm, 'font-size', ECHELLES.find((e) => e.cle === tailleTheme()).v + 'rem');
       for (const f of champs) f();
     };
     main.append(apercu, etat);
@@ -512,11 +549,26 @@
       main.append(h('label', { for: id }, x.nom), h('p', { class: 'doux' }, x.ou), h('div', { class: 'outils' }, sel, code,
         h('button', { class: 'petit', onclick: () => { fixerCouleur(x.cle, DEF[x.cle]); modifie(); maj(); } }, "Couleur d'origine (" + DEF[x.cle] + ')')));
     }
+    main.append(h('h2', {}, 'Polices'));
+    main.append(h('p', { class: 'doux' }, "Toutes les polices du catalogue sont libres de droits et hébergées sur le site (rien n'est chargé depuis un autre site)."));
+    for (const r of ROLES) {
+      const id = 'pol-' + r.cle, sel = h('select', { id, 'aria-label': r.nom }, POLICES.filter((p) => !r.texte || p.texte).map((p) => h('option', { value: p.cle }, p.nom)));
+      const ex = h('p', { class: 'doux', id: id + '-ex' }, r.cle === 'musique' ? 'RVL' : r.cle === 'titres' ? 'Un beau titre : Oriana Valenza' : 'Voici un texte pour juger de la lisibilité et des chiffres (2026).');
+      const sync = () => { const v = policesTheme()[r.cle]; sel.value = v; chargerPolice(v); ex.style.setProperty('font-family', '"' + v + '",serif'); ex.style.setProperty('font-size', r.cle === 'texte' ? '1rem' : '1.6rem'); ex.style.setProperty('color', couleursTheme().ink); };
+      champs.push(sync); sync();
+      sel.addEventListener('change', () => { fixerPolice(r.cle, sel.value); modifie(); maj(); });
+      main.append(h('label', { for: id }, r.nom), h('p', { class: 'doux' }, r.ou), h('div', { class: 'outils' }, sel,
+        h('button', { class: 'petit', onclick: () => { fixerPolice(r.cle, r.def); modifie(); maj(); } }, "Police d'origine")), ex);
+    }
+    main.append(h('h2', {}, 'Taille du texte'), h('p', { class: 'doux' }, 'Une seule taille pour tout le site (pour agrandir ou réduire tous les textes d\'un coup).'));
+    const radios = ECHELLES.map((e) => { const r = h('input', { type: 'radio', name: 'taille', id: 'taille-' + e.cle, value: e.cle }); r.addEventListener('change', () => { fixerTaille(e.cle); modifie(); maj(); }); return r; });
+    champs.push(() => { radios.forEach((r) => { r.checked = r.value === tailleTheme(); }); });
+    main.append(h('div', { class: 'outils' }, ECHELLES.map((e, i) => h('label', { for: 'taille-' + e.cle }, radios[i], ' ' + e.nom))));
+    maj();
     main.append(h('div', { class: 'outils' }, h('button', { class: 'danger', onclick: async () => {
-      if (!(await confirmer("Remettre le thème d'origine ?", "Toutes les couleurs reviennent à celles du départ (rien n'est publié tant que tu ne publies pas).", "Remettre le thème d'origine"))) return;
+      if (!(await confirmer("Remettre le thème d'origine ?", "Les couleurs, les polices et la taille du texte reviennent à celles du départ (rien n'est publié tant que tu ne publies pas).", "Remettre le thème d'origine"))) return;
       S.docs.theme = {}; modifie(); rendu();
     } }, "Remettre le thème d'origine")));
-    maj();
   }
 
   function bandeauJeton() {
@@ -649,7 +701,7 @@
       const modifs = [];
       const ch = changes();
       for (const k of ch) modifs.push({ cle: k, chemin: FICHIERS[k], contenu: ser(k) });
-      if (ch.includes('theme')) modifs.push({ chemin: CSS_THEME, contenu: cssTheme(couleursTheme()) }); // feuille de style générée : jamais saisie à la main
+      if (ch.includes('theme')) modifs.push({ chemin: CSS_THEME, contenu: cssTheme(couleursTheme(), policesTheme(), tailleTheme()) }); // feuille de style générée : jamais saisie à la main
       const utilisees = new Set(JSON.stringify([S.docs.fr, S.docs.en]).match(/[^"\\]+\.webp/g) || []);
       for (const [p, f] of S.staged) if (utilisees.has(p.slice(4))) modifs.push({ chemin: p, contenu: new Uint8Array(await f.blob.arrayBuffer()) });
       const tete = await pipeline(modifs, 'Mise à jour du site depuis l\'éditeur', progres);

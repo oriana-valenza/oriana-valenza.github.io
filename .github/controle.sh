@@ -100,8 +100,11 @@ controle() { # $1 = dossier
 
   # 6. Feuille de style du thème (écrite par l'éditeur d'apparence) : seulement des lignes --variable:valeur dans :root{ }
   if [ -f "$dir/css/theme.css" ]; then
-    out=$(sed -E 's#/\*.*\*/##g' "$dir/css/theme.css" | tr -d '\r' | grep -vE '^[[:space:]]*$' | grep -vE '^:root\{$|^\}$|^--[a-z0-9-]+:(#[0-9A-Fa-f]{6}|[0-9]{1,3},[0-9]{1,3},[0-9]{1,3});$' | head -5)
-    if [ -n "$out" ]; then echo "== css/theme.css : contenu non autorisé (seules les lignes --variable:#RRGGBB; sont permises)"; echo "$out"; rc=1; fi
+    out=$(sed -E 's#/\*.*\*/##g' "$dir/css/theme.css" | tr -d '\r' | grep -vE '^[[:space:]]*$' | grep -vE '^:root\{$|^\}$|^--[a-z0-9-]+:(#[0-9A-Fa-f]{6}|[0-9]{1,3},[0-9]{1,3},[0-9]{1,3});$|^--(titre|texte|titre-musique):"[A-Za-z0-9 ]{2,40}",[A-Za-z-]+(,[A-Za-z-]+){0,2};$|^--(musique-)?echelle:[0-9](\.[0-9]{1,2})?;$|^@font-face\{font-family:"[A-Za-z0-9 ]{2,40}";font-weight:[0-9]{3,4}( [0-9]{3,4})?;src:url\("\.\./polices/[a-z0-9-]+\.woff2"\) format\("woff2"\);font-display:swap\}$' | head -5)
+    if [ -n "$out" ]; then echo "== css/theme.css : contenu non autorisé (seuls sont permis : --variable:#RRGGBB;, polices du catalogue, échelles et @font-face locaux de polices/)"; echo "$out"; rc=1; fi
+    for p in $(grep -o 'polices/[a-z0-9-]*\.woff2' "$dir/css/theme.css"); do   # chaque fichier de police cité doit exister
+      [ -f "$dir/$p" ] || { echo "== css/theme.css : fichier de police absent : $p"; rc=1; }
+    done
   fi
 
   [ $rc -eq 0 ] && echo "OK : rien de suspect détecté (relire le diff quand même)."
@@ -111,7 +114,7 @@ controle() { # $1 = dossier
 autotest() {
   local t ok=0 faux c
   t=$(mktemp -d) || exit 2
-  for d in propre mail tel1 tel2 tel3 jeton fichier/references ok_mail ok_tel autre_tel theme_ok theme_url theme_import theme_bloc; do mkdir -p "$t/$d/.github"; done
+  for d in propre mail tel1 tel2 tel3 jeton fichier/references ok_mail ok_tel autre_tel theme_ok theme_url theme_import theme_bloc font_ok font_distant font_chemin font_absent font_regle; do mkdir -p "$t/$d/.github"; done
   printf '<p>Un texte.</p>\n<path d="M63.89 75.09L63.89 75.09Q62.12 75.09 60.33 74.15"/>\n' > "$t/propre/a.html"
   echo "ecrire a prenom.nom@exemple.org" > "$t/mail/a.md"
   echo "appeler le 06 12 34 56 78" > "$t/tel1/a.md"
@@ -127,10 +130,17 @@ autotest() {
   printf ':root{\n--bg:url(https://exemple.org/x.png);\n}\n' > "$t/theme_url/css/theme.css"
   printf '@import "https://exemple.org/x.css";\n' > "$t/theme_import/css/theme.css"
   printf 'body{display:none}\n' > "$t/theme_bloc/css/theme.css"
-  for c in propre ok_mail ok_tel theme_ok; do
+  mkdir -p "$t/font_ok/css" "$t/font_ok/polices" "$t/font_distant/css" "$t/font_chemin/css" "$t/font_absent/css" "$t/font_regle/css" "$t/font_regle/polices"
+  ff='@font-face{font-family:"Lora";font-weight:400 700;src:url("../polices/lora-x.woff2") format("woff2");font-display:swap}'
+  printf '%s\n:root{\n--titre:"Lora",Georgia,serif;\n--musique-echelle:0.42;\n--echelle:1.12;\n}\n' "$ff" > "$t/font_ok/css/theme.css"; echo x > "$t/font_ok/polices/lora-x.woff2"
+  printf '@font-face{font-family:"Lora";font-weight:400;src:url("https://exemple.org/lora.woff2") format("woff2");font-display:swap}\n' > "$t/font_distant/css/theme.css"
+  printf '@font-face{font-family:"Lora";font-weight:400;src:url("../polices/../../x.woff2") format("woff2");font-display:swap}\n' > "$t/font_chemin/css/theme.css"
+  printf '%s\n' "$ff" > "$t/font_absent/css/theme.css"
+  printf '@font-face{font-family:"Lora";font-weight:400;src:url("../polices/lora-x.woff2") format("woff2");font-display:swap;unicode-range:U+0}\n' > "$t/font_regle/css/theme.css"; echo x > "$t/font_regle/polices/lora-x.woff2"
+  for c in propre ok_mail ok_tel theme_ok font_ok; do
     controle "$t/$c" >/dev/null; [ $? -eq 0 ] && echo "PASS négatif : $c accepté" || { echo "FAIL négatif : $c refusé à tort"; ok=1; }
   done
-  for c in mail tel1 tel2 tel3 jeton fichier autre_tel theme_url theme_import theme_bloc; do
+  for c in mail tel1 tel2 tel3 jeton fichier autre_tel theme_url theme_import theme_bloc font_distant font_chemin font_absent font_regle; do
     controle "$t/$c" >/dev/null; [ $? -eq 1 ] && echo "PASS positif : $c bloqué" || { echo "FAIL positif : $c NON détecté"; ok=1; }
   done
   rm -rf "$t"; exit $ok

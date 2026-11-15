@@ -12,7 +12,7 @@ window.LIBELLES = (() => {
     { id: 'ui', titre: 'Petits textes du site', aide: 'Bas de page, boutons, menu, messages', cles: ['ui', 'nav', 'page_404'] },
     { id: 'liens', titre: 'Liens', aide: 'YouTube, Spotify, Amazon, réseaux', special: 'liens' },
     { id: 'bio', titre: 'Biographie', aide: 'Le texte de présentation', special: 'bio' },
-    { id: 'apparence', titre: 'Apparence : couleurs', aide: 'Les couleurs de tout le site', special: 'apparence' },
+    { id: 'apparence', titre: 'Apparence : couleurs et polices', aide: 'Les couleurs, les polices et la taille du texte de tout le site', special: 'apparence' },
   ];
   // Couleurs du thème (donnees/theme.json). Chaque ligne dit où la couleur apparaît ; « def » = valeur d'origine (:root de css/base.css).
   const COULEURS = [
@@ -24,6 +24,35 @@ window.LIBELLES = (() => {
     { cle: 'or', def: '#B8975A', nom: 'Or', ou: 'L\'auréole, les liens survolés et les accents des pages Musique, Services et Oriana.' },
     { cle: 'rouge', def: '#A8292E', nom: 'Rouge', ou: 'La rose, le cœur et les accents des pages Écriture et Audiovisuel.' },
   ];
+  // Polices du catalogue (libres, licence OFL dans polices/OFL_<fichier>.txt). « base » = déjà déclarée dans css/base.css ; sinon @font-face écrit dans theme.css.
+  // « poids » = poids du fichier ; « texte » = utilisable pour le texte courant (poids 300 à 600 nécessaires) ; « h1 » = échelle du titre de la page Musique (Italianno est très petite, elle vaut 1).
+  const POLICES = [
+    { cle: 'Petit Formal Script', nom: "Petit Formal Script (script attaché, titres d'origine)", gen: 'Georgia,serif', base: true, fichier: 'petit-formal-script-latin-400-normal', poids: '400', h1: 0.5 },
+    { cle: 'Italianno', nom: "Italianno (script fin, titre Musique d'origine)", gen: 'Georgia,serif', base: true, fichier: 'italianno-latin-400-normal', poids: '400', h1: 1 },
+    { cle: 'Montserrat', nom: "Montserrat (sans empattement, texte d'origine)", gen: 'system-ui,sans-serif', base: true, fichier: 'montserrat-latin-400-normal', poids: '400', texte: true, h1: 0.42 },
+    { cle: 'Great Vibes', nom: 'Great Vibes (script élégant)', gen: 'Georgia,serif', fichier: 'great-vibes-latin-400-normal', poids: '400', h1: 0.55 },
+    { cle: 'Pinyon Script', nom: 'Pinyon Script (script classique)', gen: 'Georgia,serif', fichier: 'pinyon-script-latin-400-normal', poids: '400', h1: 0.55 },
+    { cle: 'Parisienne', nom: 'Parisienne (script souple)', gen: 'Georgia,serif', fichier: 'parisienne-latin-400-normal', poids: '400', h1: 0.55 },
+    { cle: 'Allura', nom: 'Allura (script léger)', gen: 'Georgia,serif', fichier: 'allura-latin-400-normal', poids: '400', h1: 0.6 },
+    { cle: 'Cinzel', nom: 'Cinzel (capitales classiques)', gen: 'Georgia,serif', fichier: 'cinzel-latin-400-normal', poids: '400', h1: 0.4 },
+    { cle: 'Libre Baskerville', nom: 'Libre Baskerville (serif de livre)', gen: 'Georgia,serif', fichier: 'libre-baskerville-latin-400-normal', poids: '400', h1: 0.42 },
+    { cle: 'Playfair Display', nom: 'Playfair Display (serif contrasté)', gen: 'Georgia,serif', fichier: 'playfair-display-latin-wght-normal', poids: '400 900', texte: true, h1: 0.42 },
+    { cle: 'Cormorant', nom: 'Cormorant (serif fin)', gen: 'Georgia,serif', fichier: 'cormorant-latin-wght-normal', poids: '300 700', texte: true, h1: 0.5 },
+    { cle: 'EB Garamond', nom: 'EB Garamond (serif classique)', gen: 'Georgia,serif', fichier: 'eb-garamond-latin-wght-normal', poids: '400 800', texte: true, h1: 0.45 },
+    { cle: 'Lora', nom: 'Lora (serif lisible)', gen: 'Georgia,serif', fichier: 'lora-latin-wght-normal', poids: '400 700', texte: true, h1: 0.42 },
+    { cle: 'Source Sans 3', nom: 'Source Sans 3 (sans empattement neutre)', gen: 'system-ui,sans-serif', fichier: 'source-sans-3-latin-wght-normal', poids: '200 900', texte: true, h1: 0.42 },
+    { cle: 'Nunito', nom: 'Nunito (sans empattement arrondi)', gen: 'system-ui,sans-serif', fichier: 'nunito-latin-wght-normal', poids: '200 900', texte: true, h1: 0.42 },
+    { cle: 'Open Sans', nom: 'Open Sans (sans empattement lisible)', gen: 'system-ui,sans-serif', fichier: 'open-sans-latin-wght-normal', poids: '300 800', texte: true, h1: 0.42 },
+    { cle: 'Raleway', nom: 'Raleway (sans empattement élégant)', gen: 'system-ui,sans-serif', fichier: 'raleway-latin-wght-normal', poids: '200 900', texte: true, h1: 0.42 },
+  ];
+  // Les 3 rôles de police (donnees/theme.json, clé « polices ») ; « def » = police d'origine, « ou » = où elle apparaît.
+  const ROLES = [
+    { cle: 'titres', var: 'titre', def: 'Petit Formal Script', nom: 'Police des titres', ou: 'Les grands titres et les titres des blocs, des livres, des films et des clips.' },
+    { cle: 'texte', var: 'texte', def: 'Montserrat', nom: 'Police du texte', ou: "Tous les paragraphes, le menu, les boutons, les légendes et le nom en arc sur l'accueil.", texte: true },
+    { cle: 'musique', var: 'titre-musique', def: 'Italianno', nom: 'Police du titre de la page Musique', ou: 'Seulement le grand titre « RVL » en haut de la page Musique.' },
+  ];
+  // Taille du texte : une seule échelle pour tout le site (multiplie toutes les tailles de texte).
+  const ECHELLES = [{ cle: 'petit', nom: 'Petit', v: 0.9 }, { cle: 'normal', nom: "Normal (d'origine)", v: 1 }, { cle: 'grand', nom: 'Grand', v: 1.12 }];
   // Règle de couleur : ROUGE = titre d'un bloc de la page (dans l'ordre du site) ; NOIR = les champs à l'intérieur.
   const GOOGLE = { titre: 'Pour Google et le partage', cles: ['meta_titre', 'meta_description'] };
   const BLOCS = {
@@ -101,5 +130,5 @@ window.LIBELLES = (() => {
       titres_h: 'Titre de la liste des titres', clip_bientot: 'Texte dans le cadre vide du clip (avant la vidéo)', credit_label: 'Rôle du crédit (ex. Arrangeur-piano)', credit: 'Nom du crédit' },
     services: { contact_txt: 'Texte du contact (par exemple ton adresse e-mail professionnelle)', contact_form: 'Phrase sur le formulaire de contact', plaquette: 'Phrase sur la plaquette de services' },
   };
-  return { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS };
+  return { SECTIONS, GOOGLE, BLOCS, ETIQ, NOM_ELEMENT, SECTION_NOM, LIENS_ETIQ, PARTAGES, MODELES, CACHES, LONGS, ETIQ_SEC, COULEURS, POLICES, ROLES, ECHELLES };
 })();
