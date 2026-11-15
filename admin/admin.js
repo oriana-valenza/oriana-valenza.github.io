@@ -376,7 +376,7 @@
         if (k.startsWith('youtube_')) champ.addEventListener('change', () => { const y = idYoutube(champ.value); if (y) { champ.value = y; L[k] = y; modifie(); } }); // adresse complète acceptée
         main.append(h('label', { for: id }, LIENS_ETIQ[k] || etiquette(k)), champ);
       }
-      main.append(h('p', { class: 'doux' }, 'Laisse vide si tu n\'as pas encore le lien : le site affichera « Bientôt » ou ne montrera rien.'));
+      main.append(h('p', { class: 'doux' }, 'Laisse vide si tu n\'as pas encore le lien : le site affichera « Bientôt » ou ne montrera rien. Pour AJOUTER un autre lien (TikTok, un site…), descends au bloc « Autres réseaux » juste en dessous.'));
       // Autres réseaux : chacun apparaît en bas de toutes les pages dès qu'il a un nom ET une adresse
       if (!Array.isArray(L.reseaux)) L.reseaux = [];
       main.append(h('h3', { class: 'bloc' }, 'Autres réseaux (affichés en bas de toutes les pages)'));
@@ -386,7 +386,7 @@
           h('label', { for: id + 'u' }, 'Adresse de ta page (https://…)'), champTexte(r.url, false, (v) => { r.url = v; }, id + 'u'),
           h('div', { class: 'outils' }, h('button', { class: 'petit danger', onclick: async () => { if (await confirmer('Supprimer ce réseau ?', 'Il disparaîtra du bas des pages quand tu publieras.', 'Supprimer')) { L.reseaux.splice(i, 1); modifie(); rendu(); } } }, 'Supprimer'))));
       });
-      main.append(h('div', { class: 'outils' }, h('button', { onclick: () => { L.reseaux.push({ nom: null, url: null }); modifie(); rendu(); } }, '+ Ajouter un réseau')));
+      main.append(h('div', { class: 'outils' }, h('button', { onclick: () => { L.reseaux.push({ nom: null, url: null }); modifie(); rendu(); } }, '+ Ajouter un lien (réseau, site…)')));
     } else if (sec.special === 'bio') {
       main.append(h('p', { class: 'doux' }, 'Un paragraphe = un bloc, séparé du suivant par une ligne vide.'),
         h('div', { class: 'duo deux' },
