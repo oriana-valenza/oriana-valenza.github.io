@@ -25,7 +25,7 @@
     { id: 'oriana', titre: 'Oriana (présentation)', aide: 'Présentation et parcours', cles: ['oriana'] },
     { id: 'accueil', titre: 'Accueil et informations générales', aide: 'Nom, métier, ville, texte de la page d\'accueil', cles: ['site', 'accueil'] },
     { id: 'mentions', titre: 'Mentions légales', aide: 'Texte légal du site', cles: ['mentions'] },
-    { id: 'ui', titre: 'Boutons, menus et messages', aide: 'Les petits textes du site', cles: ['ui', 'nav', 'page_404'] },
+    { id: 'ui', titre: 'Petits textes du site', aide: 'Bas de page, boutons, menu, messages', cles: ['ui', 'nav', 'page_404'] },
     { id: 'liens', titre: 'Liens', aide: 'YouTube, Spotify, Amazon, réseaux', special: 'liens' },
     { id: 'bio', titre: 'Biographie', aide: 'Le texte de présentation', special: 'bio' },
   ];
@@ -42,7 +42,7 @@
     concert_date: 'Libellé « Date »', concert_lieu: 'Libellé « Lieu »', concert_billets: 'Libellé « Billets »', lien_retour: 'Lien de retour',
   };
   const NOM_ELEMENT = { oeuvres: 'Livre', films: 'Film', parties: 'Partie', offres: 'Offre', titres: 'Titre', parcours: 'Étape', sections: 'Section', infos: 'Ligne', p: 'Paragraphe', kolam_txt: 'Paragraphe' };
-  const SECTION_NOM = { rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana', accueil: 'Accueil', site: 'Informations générales', mentions: 'Mentions légales', ui: 'Boutons et menus', nav: 'Menu', page_404: 'Page introuvable' };
+  const SECTION_NOM = { rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana', accueil: 'Accueil', site: 'Informations générales', mentions: 'Mentions légales', ui: 'Textes du site (boutons, bas de page, messages)', nav: 'Noms des pages dans le menu', page_404: 'Page introuvable (erreur 404)' };
   const LIENS_ETIQ = {
     youtube: 'YouTube : bouton « YouTube » et lecteur du clip (page Musique). Colle l\'adresse de la vidéo.',
     spotify: 'Spotify : bouton « Spotify » (page Musique). Adresse commençant par https://',
@@ -75,7 +75,33 @@
   const ecrire = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* stockage indisponible */ } };
   const dire = (txt, ms = 3500) => { const m = $('#messages'); m.replaceChildren(h('span', {}, txt)); clearTimeout(dire.t); dire.t = setTimeout(() => m.replaceChildren(), ms); };
   const slug = (s) => String(s || 'photo').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'photo';
-  const etiquette = (cle) => ETIQ[cle] || (cle.startsWith('aria_') ? 'Description pour lecteurs d\'écran' : cle.charAt(0).toUpperCase() + cle.slice(1).replace(/_/g, ' '));
+  // Libellés précis selon la partie du site : chaque champ dit où il apparaît (jamais de nom de code).
+  const ETIQ_SEC = {
+    ui: {
+      menu_ouvrir: "Menu : texte du bouton qui ouvre le menu (lu par les lecteurs d'écran)", menu_fermer: "Menu : texte du bouton qui ferme le menu (lecteurs d'écran)",
+      menu_nav: "Menu : nom du menu (lecteurs d'écran)", langue: "Choix de la langue : nom (lecteurs d'écran)", passer: "Bouton « Passer l'intro »",
+      bientot: "Mot affiché quand un contenu n'est pas encore là (« Bientôt »)", retour: "Bas de page : lien de retour vers l'accueil", aller_contenu: "Lien caché « Aller au contenu » (lecteurs d'écran)",
+      contact_h: 'Bas de page : titre de la colonne Contact', contact_txt: "Bas de page : texte du contact (par exemple ton adresse e-mail professionnelle)", contact_form: 'Bas de page : phrase sur le formulaire de contact',
+      lettre_h: "Bas de page : titre de la colonne Lettre d'information", lettre_txt: "Bas de page : texte de la lettre d'information", pages_h: 'Bas de page : titre de la liste des pages',
+      reseaux_h: 'Bas de page : titre des réseaux sociaux', mentions: 'Bas de page : lien « Mentions légales »',
+      sans_js: 'Message si le navigateur bloque JavaScript', erreur: 'Message si le contenu ne se charge pas', lire_video: 'Lecteur de vidéo : texte du bouton',
+      video_note: 'Lecteur de vidéo : phrase sous le lecteur (confidentialité YouTube)', ecouter_h: 'Page Musique : titre « Écouter et suivre »',
+      youtube: 'Nom du bouton YouTube', spotify: 'Nom du bouton Spotify', billets: 'Page Musique : nom du lien de billetterie', amazon: "Page Écriture : texte du bouton d'achat du livre",
+      instagram: 'Bas de page : nom du lien Instagram', facebook: 'Bas de page : nom du lien Facebook', visuel_bientot: "Texte « Visuel bientôt » (pas utilisé pour l'instant)", paroles_bientot: 'Page Musique : texte quand les paroles ne sont pas encore là',
+    },
+    nav: (c) => ({ accueil: 'Accueil', rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana' }[c] ? `Menu : nom de la page « ${{ accueil: 'Accueil', rvl: 'Musique (RVL)', ecriture: 'Écriture', audiovisuel: 'Audiovisuel', services: 'Services', oriana: 'Oriana' }[c]} »` : null),
+    accueil: { aria_dessin: "Description du dessin de l'ange (lecteurs d'écran)", aria_oriana: "Description du bouton « Oriana » de l'ange (lecteurs d'écran)" },
+    site: { nom: 'Ton nom (affiché sur le site)', metier: 'Ton métier', ville: 'Ta ville' },
+    page_404: { titre: 'Titre de la page introuvable', texte: 'Texte de la page introuvable', lien: 'Texte du lien de retour' },
+    mentions: { h: 'Titre de la section', p: 'Paragraphes de la section' },
+    rvl: { titres_h: 'Titre de la liste des titres', clip_bientot: 'Texte dans le cadre vide du clip (avant la vidéo)', credit_label: 'Rôle du crédit (ex. Arrangeur-piano)', credit: 'Nom du crédit' },
+    services: { contact_txt: 'Texte du contact (par exemple ton adresse e-mail professionnelle)', contact_form: 'Phrase sur le formulaire de contact', plaquette: 'Phrase sur la plaquette de services' },
+  };
+  const etiquette = (cle, sec) => {
+    const t = ETIQ_SEC[sec], r = typeof t === 'function' ? t(cle) : t && t[cle];
+    if (r) return r;
+    return ETIQ[cle] || (cle.startsWith('aria_') ? "Description pour lecteurs d'écran" : cle.charAt(0).toUpperCase() + cle.slice(1).replace(/_h$/, ' (titre)').replace(/_/g, ' '));
+  };
   const estObjet = (v) => v && typeof v === 'object' && !Array.isArray(v);
 
   class Erreur extends Error { constructor(msg, code) { super(msg); this.code = code; } }
@@ -189,7 +215,7 @@
     const parts = [tete]; let precedent = fichier === 'fr' || fichier === 'en' ? chem[0] : null;
     for (const c of chem.slice(1)) {
       if (typeof c === 'number') parts.push((NOM_ELEMENT[precedent] || 'Élément') + ' ' + (c + 1));
-      else { parts.push(etiquette(c)); precedent = c; }
+      else { parts.push(etiquette(c, chem[0])); precedent = c; }
     }
     return parts.join(' › ') + (fichier === 'en' ? ' (anglais)' : '');
   }
@@ -277,7 +303,7 @@
   function rendreObjet(conteneur, fr, en, chem) {
     for (const [cle, v] of Object.entries(fr)) {
       if (CACHES.has(cle)) continue;
-      const nom = etiquette(cle);
+      const nom = etiquette(cle, chem[0]);
       if (Array.isArray(v)) { conteneur.append(rendreListe(cle, fr, en, chem, nom)); continue; }
       if (estObjet(v)) { conteneur.append(h('h3', {}, nom)); const g = h('div', {}); rendreObjet(g, v, en[cle], [...chem, cle]); conteneur.append(g); continue; }
       if (cle === 'image') { conteneur.append(rendrePhoto(fr, en)); continue; }
